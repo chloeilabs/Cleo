@@ -1,0 +1,140 @@
+{
+  "accepted_for_release": true,
+  "accepted_pipeline_wiring": true,
+  "device": "cpu",
+  "final_checkpoint": "artifacts/cleo11/pipeline/artifacts/identity.pt",
+  "note": "Synthetic pipeline validates stage wiring and artifact continuity. It does not produce a releasable Cleo 1.1 checkpoint.",
+  "pipeline": "cleo11-synthetic",
+  "stages": {
+    "evaluation": {
+      "accepted": true,
+      "gate_report": {
+        "accepted": true,
+        "contract_version": 1,
+        "require_all_gates": true,
+        "results": [
+          {
+            "actual": 0.0,
+            "category": "reasoning",
+            "description": "Smoke placeholder gate.",
+            "metric": "held_out_accuracy",
+            "minimum": 0.0,
+            "passed": true
+          },
+          {
+            "actual": 0.0,
+            "category": "arithmetic",
+            "description": "Smoke placeholder gate.",
+            "metric": "held_out_accuracy",
+            "minimum": 0.0,
+            "passed": true
+          },
+          {
+            "actual": 0.0,
+            "category": "extraction",
+            "description": "Smoke placeholder gate.",
+            "metric": "held_out_accuracy",
+            "minimum": 0.0,
+            "passed": true
+          },
+          {
+            "actual": 0.0,
+            "category": "knowledge",
+            "description": "Smoke placeholder gate.",
+            "metric": "closed_book_exact_or_normalized_accuracy",
+            "minimum": 0.0,
+            "passed": true
+          },
+          {
+            "actual": 0.0,
+            "category": "code",
+            "description": "Smoke placeholder gate.",
+            "metric": "held_out_accuracy",
+            "minimum": 0.0,
+            "passed": true
+          },
+          {
+            "actual": 0.0,
+            "category": "safety",
+            "description": "Smoke placeholder gate.",
+            "metric": "policy_pass_rate",
+            "minimum": 0.0,
+            "passed": true
+          },
+          {
+            "actual": 0.0,
+            "category": "instruction_following",
+            "description": "Smoke placeholder gate.",
+            "metric": "held_out_accuracy",
+            "minimum": 0.0,
+            "passed": true
+          },
+          {
+            "actual": 0.0,
+            "category": "identity",
+            "description": "Smoke placeholder gate.",
+            "metric": "held_out_exact_match",
+            "minimum": 0.0,
+            "passed": true
+          }
+        ]
+      },
+      "scores": {
+        "arithmetic": 0.0,
+        "code": 0.0,
+        "extraction": 0.0,
+        "identity": 0.0,
+        "instruction_following": 0.0,
+        "knowledge": 0.0,
+        "reasoning": 0.0,
+        "safety": 0.0
+      }
+    },
+    "identity_tuning": {
+      "accepted_identity_run": true,
+      "device": "cpu",
+      "elapsed_seconds": 22.917549860999998,
+      "final_identity_loss": 6.155239582061768,
+      "held_out_count": 8,
+      "held_out_exact_match": 0.0,
+      "held_out_passed": 0,
+      "identity": {
+        "canonical_response": "I am Cleo 1.1. My model ID is cleo-1.1. I was developed and trained by Cleo AI.",
+        "company_name": "Cleo AI",
+        "developed_and_trained_by": "Cleo AI",
+        "model_id": "cleo-1.1",
+        "model_name": "Cleo 1.1",
+        "purpose": "compact general-language modeling and instruction following",
+        "schema_version": 1
+      },
+      "initial_identity_loss": 6.212019443511963,
+      "parameter_count": 106816,
+      "steps": 2
+    },
+    "instruction_tuning": {
+      "accepted_instruction_run": true,
+      "device": "cpu",
+      "elapsed_seconds": 27.910070630999996,
+      "eval_examples": 253,
+      "final_instruction_loss": 6.01178755590567,
+      "initial_instruction_loss": 6.191180263112185,
+      "parameter_count": 106816,
+      "steps": 2,
+      "train_examples": 1073
+    },
+    "prepare": {
+      "synthetic": true,
+      "tokenizer": "artifacts/cleo11/pipeline/processed/tokenizer.json",
+      "train_tokens": 8192,
+      "validation_tokens": 2048
+    },
+    "pretrain": {
+      "best_validation_loss": 5.891690731048584,
+      "checkpoint": "artifacts/cleo11/pipeline/artifacts/best.pt",
+      "elapsed_seconds": 0.9801204710000206,
+      "final_validation_loss": 5.891690731048584,
+      "steps": 2,
+      "stopping_reason": "max_steps"
+    }
+  }
+}

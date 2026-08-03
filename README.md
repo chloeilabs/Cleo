@@ -183,6 +183,18 @@ uv run cleo-1 cleo11-prepare --profile full
 # Short local train against prepared shards (use tiny overrides on M4)
 uv run cleo-1 cleo11-train --cleo11-config configs/cleo11_smoke.toml --device cpu --max-steps 3
 
+# Post-pretrain stages (synthetic curriculum until a real instruction corpus is pinned)
+uv run cleo-1 cleo11-instruction-tune --cleo11-config configs/cleo11_smoke.toml \
+  --checkpoint artifacts/cleo11/smoke/best.pt --device cpu --steps 3
+uv run cleo-1 cleo11-identity-tune --cleo11-config configs/cleo11_smoke.toml \
+  --checkpoint artifacts/cleo11/smoke/instruction.pt --device cpu --steps 3
+uv run cleo-1 cleo11-evaluate --cleo11-config configs/cleo11_smoke.toml \
+  --checkpoint artifacts/cleo11/smoke/identity.pt --device cpu
+
+# Full synthetic wiring pipeline on CPU (prepare → pretrain → instruct → identity → evaluate)
+uv run cleo-1 cleo11-pipeline --cleo11-config configs/cleo11_smoke.toml \
+  --output-dir artifacts/cleo11/pipeline --device cpu
+
 # Cloud launch dry-run (prints Docker + torchrun; does not spend credits)
 uv run cleo-1 cleo11-launch --profile full --emit-script /tmp/cleo11-launch.sh
 ```

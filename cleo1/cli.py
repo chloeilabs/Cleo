@@ -228,6 +228,71 @@ def build_parser() -> argparse.ArgumentParser:
         metavar="PATH",
         help="Write a runnable bash launcher script",
     )
+
+    cleo11_instruction = subparsers.add_parser(
+        "cleo11-instruction-tune",
+        help="Answer-only instruction-tune a Cleo 1.1 pretrain checkpoint",
+    )
+    cleo11_instruction.add_argument("--cleo11-config", default=DEFAULT_CLEO11_CONFIG)
+    cleo11_instruction.add_argument("--checkpoint", required=True)
+    cleo11_instruction.add_argument("--output")
+    cleo11_instruction.add_argument("--tokenizer")
+    cleo11_instruction.add_argument(
+        "--device", choices=["auto", "cuda", "mps", "cpu"], default="auto"
+    )
+    cleo11_instruction.add_argument("--steps", type=int, default=200)
+    cleo11_instruction.add_argument("--learning-rate", type=float, default=5e-5)
+    cleo11_instruction.add_argument("--batch-size", type=int, default=4)
+    cleo11_instruction.add_argument("--eval-interval", type=int, default=50)
+    cleo11_instruction.add_argument("--seed", type=int, default=1337)
+
+    cleo11_identity = subparsers.add_parser(
+        "cleo11-identity-tune",
+        help="Teach a Cleo 1.1 checkpoint the canonical Cleo AI / Cleo 1.1 identity",
+    )
+    cleo11_identity.add_argument("--cleo11-config", default=DEFAULT_CLEO11_CONFIG)
+    cleo11_identity.add_argument("--checkpoint", required=True)
+    cleo11_identity.add_argument("--output")
+    cleo11_identity.add_argument("--tokenizer")
+    cleo11_identity.add_argument(
+        "--device", choices=["auto", "cuda", "mps", "cpu"], default="auto"
+    )
+    cleo11_identity.add_argument("--steps", type=int, default=100)
+    cleo11_identity.add_argument("--learning-rate", type=float, default=1e-5)
+    cleo11_identity.add_argument("--batch-size", type=int, default=4)
+    cleo11_identity.add_argument("--eval-interval", type=int, default=25)
+    cleo11_identity.add_argument("--seed", type=int, default=1337)
+
+    cleo11_evaluate = subparsers.add_parser(
+        "cleo11-evaluate",
+        help="Run Cleo 1.1 capability gates against a checkpoint",
+    )
+    cleo11_evaluate.add_argument("--cleo11-config", default=DEFAULT_CLEO11_CONFIG)
+    cleo11_evaluate.add_argument("--checkpoint", required=True)
+    cleo11_evaluate.add_argument("--tokenizer")
+    cleo11_evaluate.add_argument(
+        "--device", choices=["auto", "cuda", "mps", "cpu"], default="auto"
+    )
+    cleo11_evaluate.add_argument("--max-new-tokens", type=int, default=48)
+    cleo11_evaluate.add_argument("--examples-per-category", type=int, default=16)
+    cleo11_evaluate.add_argument("--output")
+    cleo11_evaluate.add_argument("--seed", type=int, default=1337)
+
+    cleo11_pipeline = subparsers.add_parser(
+        "cleo11-pipeline",
+        help="Run the synthetic prepare→pretrain→instruct→identity→evaluate wiring pipeline",
+    )
+    cleo11_pipeline.add_argument("--cleo11-config", default=DEFAULT_CLEO11_SMOKE_CONFIG)
+    cleo11_pipeline.add_argument("--output-dir", default="artifacts/cleo11/pipeline")
+    cleo11_pipeline.add_argument(
+        "--device", choices=["auto", "cuda", "mps", "cpu"], default="cpu"
+    )
+    cleo11_pipeline.add_argument("--pretrain-steps", type=int, default=3)
+    cleo11_pipeline.add_argument("--instruction-steps", type=int, default=3)
+    cleo11_pipeline.add_argument("--identity-steps", type=int, default=3)
+    cleo11_pipeline.add_argument("--microbatch-size", type=int, default=2)
+    cleo11_pipeline.add_argument("--examples-per-category", type=int, default=4)
+    cleo11_pipeline.add_argument("--max-new-tokens", type=int, default=24)
     return parser
 
 
@@ -442,6 +507,71 @@ def main(argv: list[str] | None = None) -> int:
             plan["emitted_script"] = str(script_path)
         print(json.dumps(plan, indent=2, sort_keys=True))
         return 0
+    if args.command == "cleo11-instruction-tune":
+        from .cleo11.instruction_tuning import instruction_tune_from_config_path
+
+        report = instruction_tune_from_config_path(
+            args.cleo11_config,
+            args.checkpoint,
+            output_path=args.output,
+            tokenizer_path=args.tokenizer,
+            requested_device=args.device,
+            steps=args.steps,
+            learning_rate=args.learning_rate,
+            batch_size=args.batch_size,
+            eval_interval=args.eval_interval,
+            seed=args.seed,
+        )
+        print(json.dumps(report, indent=2, sort_keys=True))
+        return 0 if report["accepted_instruction_run"] else 2
+    if args.command == "cleo11-identity-tune":
+        from .cleo11.identity_tuning import identity_tune_from_config_path
+
+        report = identity_tune_from_config_path(
+            args.cleo11_config,
+            args.checkpoint,
+            output_path=args.output,
+            tokenizer_path=args.tokenizer,
+            requested_device=args.device,
+            steps=args.steps,
+            learning_rate=args.learning_rate,
+            batch_size=args.batch_size,
+            eval_interval=args.eval_interval,
+            seed=args.seed,
+        )
+        print(json.dumps(report, indent=2, sort_keys=True))
+        return 0 if report["accepted_identity_run"] else 2
+    if args.command == "cleo11-evaluate":
+        from .cleo11.evaluation import evaluate_from_config_path
+
+        report = evaluate_from_config_path(
+            args.cleo11_config,
+            args.checkpoint,
+            tokenizer_path=args.tokenizer,
+            requested_device=args.device,
+            max_new_tokens=args.max_new_tokens,
+            examples_per_category=args.examples_per_category,
+            output_path=args.output,
+            seed=args.seed,
+        )
+        print(json.dumps(report, indent=2, sort_keys=True))
+        return 0 if report["accepted"] else 2
+    if args.command == "cleo11-pipeline":
+        from .cleo11.pipeline import pipeline_from_config_path
+
+        report = pipeline_from_config_path(
+            args.cleo11_config,
+            output_dir=args.output_dir,
+            requested_device=args.device,
+            pretrain_steps=args.pretrain_steps,
+            instruction_steps=args.instruction_steps,
+            identity_steps=args.identity_steps,
+            microbatch_size=args.microbatch_size,
+            examples_per_category=args.examples_per_category,
+            max_new_tokens=args.max_new_tokens,
+        )
+        print(json.dumps(report, indent=2, sort_keys=True))
+        return 0 if report["accepted_pipeline_wiring"] else 2
     raise AssertionError(f"unhandled command: {args.command}")
 
 

@@ -36,8 +36,8 @@ tokenizer_vocab_size = 512
 tokenizer_kind = "byte_bpe"
 mixture_name = "smoke-synthetic"
 minimum_pretrain_tokens = 1024
-instruction_stage = "skipped_for_smoke"
-identity_stage = "skipped_for_smoke"
+instruction_stage = "synthetic_instruction_tuning"
+identity_stage = "synthetic_identity_tuning"
 
 [[data.sources]]
 name = "Synthetic educational notes"

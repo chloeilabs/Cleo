@@ -17,3 +17,4 @@ artifacts/*.pt
 artifacts/**/*.pt
 artifacts/*.tmp
 artifacts/cleo11/smoke/
+artifacts/cleo11/pipeline/
