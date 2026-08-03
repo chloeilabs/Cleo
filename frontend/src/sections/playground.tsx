@@ -23,7 +23,7 @@ import {
 import { Slider } from "@/components/ui/slider"
 import { Textarea } from "@/components/ui/textarea"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
-import { streamStory } from "@/lib/api"
+import { streamGeneration } from "@/lib/api"
 import type { ModelProfile } from "@/types"
 
 function randomUint32(): number {
@@ -80,10 +80,10 @@ function SamplingControl({
 
 export function Playground({ profile }: { profile: ModelProfile }) {
   const starters = profile.prompt_starters
-  const initialPrompt = starters[0]?.prompt ?? "Once upon a time"
+  const initialPrompt = starters[0]?.prompt ?? "Explain one useful concept in two short sentences."
   const [prompt, setPrompt] = useState(initialPrompt)
   const [starter, setStarter] = useState(initialPrompt)
-  const [maxNewTokens, setMaxNewTokens] = useState(300)
+  const [maxNewTokens, setMaxNewTokens] = useState(160)
   const [temperature, setTemperature] = useState(0.8)
   const [topK, setTopK] = useState(40)
   const [seed, setSeed] = useState(42)
@@ -122,13 +122,13 @@ export function Playground({ profile }: { profile: ModelProfile }) {
     const controller = new AbortController()
     controllerRef.current = controller
     setError("")
-    setOutput(prompt)
+    setOutput("")
     setStatus("Connecting to Cleo 1…")
     setIsGenerating(true)
     outputRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })
 
     try {
-      await streamStory(
+      await streamGeneration(
         {
           prompt,
           max_new_tokens: maxNewTokens,
@@ -159,7 +159,7 @@ export function Playground({ profile }: { profile: ModelProfile }) {
     setPrompt(value)
     setOutput("")
     setError("")
-    setStatus("Starter loaded · edit it freely, then generate")
+    setStatus("Prompt loaded · edit it freely, then generate")
   }
 
   const surprise = () => {
@@ -171,7 +171,7 @@ export function Playground({ profile }: { profile: ModelProfile }) {
     setSeed(nextSeed)
     setOutput("")
     setError("")
-    setStatus(`Surprise starter loaded · seed ${nextSeed.toLocaleString()}`)
+    setStatus(`Prompt loaded · seed ${nextSeed.toLocaleString()}`)
   }
 
   const clear = () => {
@@ -180,7 +180,7 @@ export function Playground({ profile }: { profile: ModelProfile }) {
     setPrompt("")
     setOutput("")
     setError("")
-    setStatus("Ready · choose a starter or write your own beginning")
+    setStatus("Ready · choose a prompt or write your own instruction")
   }
 
   const copyOutput = async () => {
@@ -191,14 +191,14 @@ export function Playground({ profile }: { profile: ModelProfile }) {
   }
 
   return (
-    <section id="playground" className="scroll-mt-20 py-28 sm:py-32">
+    <section id="playground" className="py-28 sm:py-32">
       <div className="mx-auto max-w-[1240px] px-5 sm:px-8">
         <div className="mb-12">
           <div className="mb-5 flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[.18em] text-brand-green">
             <span className="size-1.5 rounded-full bg-current" /> Live playground
           </div>
-          <h2 className="text-6xl font-semibold leading-[.92] tracking-[-.06em] sm:text-7xl lg:text-8xl">Give it a beginning.</h2>
-          <p className="mt-6 max-w-2xl text-base leading-7 text-muted-foreground">The checkpoint stays in local memory and streams tokens from the {profile.runtime.device} device. Reuse the same seed and settings to reproduce a result.</p>
+          <h2 className="text-6xl font-semibold leading-[.92] tracking-[-.06em] sm:text-7xl lg:text-8xl">Ask something focused.</h2>
+          <p className="mt-6 max-w-2xl text-base leading-7 text-muted-foreground">The checkpoint stays in local memory and streams responses from the {profile.runtime.device} device. Short, concrete instructions work best. This is an experimental 7.9M-parameter alpha, so expect incorrect or repetitive output.</p>
         </div>
 
         <div className="grid items-start gap-5 lg:grid-cols-[1.15fr_.85fr]">
@@ -207,10 +207,10 @@ export function Playground({ profile }: { profile: ModelProfile }) {
               <CardContent className="space-y-5 pt-6">
                 <div className="grid items-end gap-3 sm:grid-cols-[1fr_auto]">
                   <div className="space-y-2">
-                    <Label>Prompt starter</Label>
-                    <p className="text-xs text-muted-foreground">Pick a tested opening or write your own</p>
+                    <Label>Prompt template</Label>
+                    <p className="text-xs text-muted-foreground">Pick a capability probe or write your own</p>
                     <Select value={starter || undefined} onValueChange={chooseStarter}>
-                      <SelectTrigger className="h-11 w-full bg-brand-paper"><SelectValue placeholder="Choose a story opening" /></SelectTrigger>
+                      <SelectTrigger className="h-11 w-full bg-brand-paper"><SelectValue placeholder="Choose a prompt" /></SelectTrigger>
                       <SelectContent>
                         {starters.map((item) => <SelectItem key={item.prompt} value={item.prompt}>{item.label}</SelectItem>)}
                       </SelectContent>
@@ -221,11 +221,11 @@ export function Playground({ profile }: { profile: ModelProfile }) {
                   </Button>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="story-prompt">Story beginning</Label>
+                  <Label htmlFor="model-prompt">Instruction or question</Label>
                   <p className="text-xs text-muted-foreground">Press Enter to generate · Shift+Enter for a new line · / to focus</p>
                   <Textarea
                     ref={promptRef}
-                    id="story-prompt"
+                    id="model-prompt"
                     value={prompt}
                     maxLength={2_000}
                     onChange={(event) => setPrompt(event.target.value)}
@@ -235,11 +235,11 @@ export function Playground({ profile }: { profile: ModelProfile }) {
                         void generate()
                       }
                     }}
-                    placeholder="Once upon a time…"
+                    placeholder="Ask Cleo 1 a focused question…"
                     className="min-h-40 resize-y bg-brand-paper text-base leading-7"
                   />
                 </div>
-                <p className="text-xs leading-5 text-muted-foreground">Short, concrete openings leave more of the {profile.architecture.block_size}-token context for the story.</p>
+                <p className="text-xs leading-5 text-muted-foreground">The server applies the same instruction template used during tuning. Short prompts leave more of the {profile.architecture.block_size}-token context for the response.</p>
               </CardContent>
             </Card>
 
@@ -251,20 +251,20 @@ export function Playground({ profile }: { profile: ModelProfile }) {
                 </div>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon" onClick={() => void copyOutput()} disabled={!output} aria-label="Copy story">
+                    <Button variant="ghost" size="icon" onClick={() => void copyOutput()} disabled={!output} aria-label="Copy response">
                       {copied ? <Check className="text-brand-green" /> : <Copy />}
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent>{copied ? "Copied" : "Copy story"}</TooltipContent>
+                  <TooltipContent>{copied ? "Copied" : "Copy response"}</TooltipContent>
                 </Tooltip>
               </CardHeader>
               <CardContent>
                 <div
-                  id="story-output"
-                  className={`min-h-[360px] whitespace-pre-wrap rounded-2xl border bg-brand-paper p-5 font-serif text-[17px] leading-8 ${output ? "text-foreground" : "text-muted-foreground"}`}
+                  id="model-output"
+                  className={`min-h-[360px] whitespace-pre-wrap rounded-2xl border bg-brand-paper p-5 text-[16px] leading-8 ${output ? "text-foreground" : "text-muted-foreground"}`}
                   aria-live="polite"
                 >
-                  {output || "Your story will appear here token by token…"}
+                  {output || "Cleo 1's response will appear here token by token…"}
                 </div>
               </CardContent>
             </Card>
@@ -276,7 +276,7 @@ export function Playground({ profile }: { profile: ModelProfile }) {
               <p className="text-sm leading-6 text-muted-foreground">Shape the continuation without changing the checkpoint.</p>
             </CardHeader>
             <CardContent className="space-y-7">
-              <SamplingControl label="Length" hint="Maximum new tokens" value={maxNewTokens} display={String(maxNewTokens)} min={32} max={512} step={16} onValueChange={setMaxNewTokens} />
+              <SamplingControl label="Length" hint="Maximum new tokens" value={maxNewTokens} display={String(maxNewTokens)} min={16} max={256} step={16} onValueChange={setMaxNewTokens} />
               <SamplingControl label="Creativity" hint="Higher values are more surprising" value={temperature} display={temperature.toFixed(2)} min={0.3} max={1.5} step={0.05} onValueChange={setTemperature} />
               <SamplingControl label="Top-k" hint="0 considers the full vocabulary" value={topK} display={String(topK)} min={0} max={100} step={1} onValueChange={setTopK} />
               <div className="space-y-2">
@@ -286,7 +286,7 @@ export function Playground({ profile }: { profile: ModelProfile }) {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <Button className="col-span-2 h-11 bg-brand-ink text-white hover:bg-brand-green" onClick={() => void generate()} disabled={isGenerating || !prompt.trim()}>
-                  {isGenerating ? <><Sparkles className="animate-pulse" /> Writing…</> : <><Play /> Generate story</>}
+                  {isGenerating ? <><Sparkles className="animate-pulse" /> Generating…</> : <><Play /> Generate response</>}
                 </Button>
                 <Button variant="destructive" className="h-10" onClick={stop} disabled={!isGenerating}><Octagon /> Stop</Button>
                 <Button variant="secondary" className="h-10" onClick={clear}><Eraser /> Clear</Button>

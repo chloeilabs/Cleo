@@ -1,16 +1,16 @@
-import { BadgeCheck, CheckCircle2, Database, Dumbbell, Fingerprint } from "lucide-react"
+import { BadgeCheck, CheckCircle2, Database, Dumbbell, Fingerprint, MessagesSquare } from "lucide-react"
 
 import { fixed, number } from "@/lib/format"
 import type { ModelProfile } from "@/types"
 
 export function Training({ profile }: { profile: ModelProfile }) {
-  const { training, dataset, metrics, adaptation } = profile
+  const { training, dataset, generalization, adaptation } = profile
   const timeline = [
     {
       icon: Database,
-      step: "DATA 01",
-      title: `${number(dataset.train_stories)} training stories`,
-      copy: `First official TinyStories training shard plus the complete ${number(dataset.validation_stories)}-story validation split, revision ${dataset.revision.slice(0, 12)}…`,
+      step: "FOUNDATION 01",
+      title: `${number(generalization.foundation_steps)} steps from random weights`,
+      copy: `The original language foundation used ${number(dataset.train_stories)} TinyStories examples. That provenance remains part of this release, but it is no longer the model's only training distribution.`,
     },
     {
       icon: Fingerprint,
@@ -20,28 +20,34 @@ export function Training({ profile }: { profile: ModelProfile }) {
     },
     {
       icon: Dumbbell,
-      step: "TRAIN 03",
-      title: `${number(metrics.training_step)} AdamW steps`,
-      copy: "8,192 effective tokens per step, 500-step warmup, cosine decay, gradient clipping, and FP32 MPS execution.",
+      step: "GENERALIZE 03",
+      title: `${number(generalization.continued_pretraining_steps)} continued-pretraining steps`,
+      copy: `${number(dataset.general.train_documents)} WikiText documents and ${number(dataset.general.train_tokens)} prepared tokens broadened the language distribution. Ten percent of microbatches retained foundation data.`,
     },
     {
-      icon: CheckCircle2,
-      step: "CHECK 04",
-      title: "Self-describing checkpoint",
-      copy: "Weights, optimizer, scheduler, RNG state, model configuration, tokenizer checksum, dataset manifest, and best loss travel together.",
+      icon: MessagesSquare,
+      step: "INSTRUCT 04",
+      title: `${number(generalization.instruction_tuning_steps)} instruction-tuning steps`,
+      copy: `${number(dataset.instruction.train_examples)} Dolly examples across eight categories trained answer-only targets, mixed with general-language, foundation, and identity-retention batches.`,
     },
-    ...(adaptation.identity_tuned
+    ...(generalization.accepted && adaptation.identity_tuned
       ? [{
           icon: BadgeCheck,
-          step: "IDENTITY 05",
-          title: `${number(adaptation.completed_steps)}-step identity tune`,
-          copy: `${fixed(adaptation.held_out_exact_match * 100, 0)}% exact match on held-out identity prompts. Story validation loss changed by ${fixed((adaptation.story_loss_ratio - 1) * 100, 2)}%, inside the 3% retention gate.`,
+          step: "REPAIR 05",
+          title: `${number(generalization.identity_repair_steps)}-step identity repair`,
+          copy: `${fixed(adaptation.held_out_exact_match * 100, 0)}% exact match on eight held-out identity prompts while preserving general, instruction, and foundation losses inside the repair gates.`,
         }]
       : []),
+    {
+      icon: CheckCircle2,
+      step: "RELEASE 06",
+      title: "Self-describing gated checkpoint",
+      copy: "Weights, configuration, RNG state, tokenizer checksum, source manifests, stage metrics, and acceptance results travel with the release.",
+    },
   ]
 
   return (
-    <section id="training" className="scroll-mt-20 py-28 sm:py-32">
+    <section id="training" className="py-28 sm:py-32">
       <div className="mx-auto grid max-w-[1240px] gap-14 px-5 sm:px-8 lg:grid-cols-[.9fr_1.1fr] lg:gap-20">
         <div className="lg:sticky lg:top-28 lg:self-start">
           <div className="mb-5 flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[.18em] text-brand-green">
@@ -51,7 +57,7 @@ export function Training({ profile }: { profile: ModelProfile }) {
             Ground up means ground up.
           </h2>
           <p className="mt-7 max-w-lg text-base leading-7 text-muted-foreground">
-            Random initialization to final checkpoint in {training.duration} on Apple Silicon. The run processed {number(training.tokens_seen)} training-token presentations and improved validation loss at every scheduled evaluation.
+            Random initialization to the promoted alpha checkpoint in {training.duration} on Apple Silicon. The autoregressive stages processed {number(training.tokens_seen)} token presentations; every later stage had explicit retention gates.
           </p>
         </div>
         <div className="border-t">

@@ -6,12 +6,12 @@ import { compactNumber, fixed, number } from "@/lib/format"
 import type { ModelProfile } from "@/types"
 
 export function Hero({ profile }: { profile: ModelProfile }) {
-  const { identity, runtime, architecture, metrics, benchmark } = profile
+  const { identity, runtime, architecture, metrics, generalization } = profile
   const headlineMetrics = [
     [compactNumber(metrics.parameter_count), "trainable parameters"],
-    [fixed(metrics.best_validation_loss, 3), "best validation loss"],
-    [fixed(metrics.best_validation_perplexity, 2), "validation perplexity"],
-    [`${fixed(benchmark.cache_speedup, 2)}×`, "KV-cache speedup"],
+    [`${fixed(generalization.general_loss_reduction_percent, 1)}%`, "lower general-language loss"],
+    [`${fixed(generalization.instruction_loss_reduction_percent, 1)}%`, "lower instruction loss"],
+    [`${architecture.block_size}`, "token context window"],
   ]
   const signalSpecs = [
     { icon: Cpu, label: "Context", value: `${architecture.block_size} tokens` },
@@ -33,12 +33,13 @@ export function Hero({ profile }: { profile: ModelProfile }) {
               {identity.company_name} / {identity.release}
             </div>
             <h1 className="max-w-[760px] text-[clamp(4.5rem,8.2vw,8rem)] font-semibold leading-[.82] tracking-[-0.07em]">
-              A small model with a <span className="text-brand-lime">story</span> to tell.
+              Small model. <span className="text-brand-lime">Broader language.</span>
             </h1>
             <p className="mt-8 max-w-2xl text-base leading-7 text-white/62 sm:text-lg">
-              {identity.model_name} is fully inspectable and trained from random weights on one
-              Apple M4. No pretrained model. No borrowed tokenizer. Just {number(metrics.parameter_count)} learned
-              parameters and a very specific job.
+              {identity.model_name} is a fully inspectable general-language research model trained
+              from random weights on one Apple M4. Its new alpha checkpoint adds continued
+              pretraining, instruction tuning, and a 512-token context—without pretrained weights
+              or a borrowed tokenizer.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
               <Button
@@ -62,7 +63,7 @@ export function Hero({ profile }: { profile: ModelProfile }) {
               </Button>
             </div>
             <p className="mt-7 font-mono text-[11px] uppercase tracking-[0.08em] text-white/38">
-              Local research model · decoder-only transformer · {runtime.checkpoint}
+              Experimental general-language alpha · decoder-only transformer · {runtime.checkpoint}
             </p>
           </div>
 
@@ -80,7 +81,7 @@ export function Hero({ profile }: { profile: ModelProfile }) {
                 <div className="orbit-ring orbit-reverse absolute inset-[16%] rounded-full border border-white/10" />
                 <div className="absolute inset-[31%] grid place-items-center rounded-full bg-brand-lime text-center text-brand-ink shadow-[0_0_80px_rgba(202,255,69,.18)]">
                   <div>
-                    <strong className="block text-5xl font-semibold tracking-[-0.06em]">8M</strong>
+                    <strong className="block text-5xl font-semibold tracking-[-0.06em]">{compactNumber(metrics.parameter_count)}</strong>
                     <span className="text-[10px] font-bold uppercase tracking-[0.12em] opacity-60">
                       parameters
                     </span>

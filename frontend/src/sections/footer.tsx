@@ -8,7 +8,7 @@ export function Footer({ profile }: { profile: ModelProfile }) {
         <div>
           <strong className="text-3xl font-semibold tracking-[-.045em]">{profile.identity.company_name}</strong>
           <p className="mt-3 max-w-xl text-sm leading-6 text-white/45">
-            {profile.identity.model_name} · <code className="text-white/65">{profile.identity.model_id}</code> · A local research release built to make the complete path from bytes to stories understandable.
+            {profile.identity.model_name} · <code className="text-white/65">{profile.identity.model_id}</code> · A local general-language alpha built to make the complete path from bytes to model behavior inspectable.
           </p>
         </div>
         <div className="font-mono text-[10px] uppercase leading-6 tracking-[.08em] text-white/45 md:text-right">

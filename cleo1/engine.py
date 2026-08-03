@@ -497,7 +497,14 @@ def generate_text(
     if checkpoint["tokenizer_checksum"] != expected_checksum:
         raise RuntimeError("checkpoint tokenizer checksum mismatch")
     seed_everything(seed)
-    prompt_ids = tokenizer.encode(prompt, bos=True)
+    generalized = bool(checkpoint.get("generalization", {}).get("accepted", False))
+    if generalized:
+        from .general_data import render_instruction_prompt
+
+        model_prompt = render_instruction_prompt(prompt.strip(), "")
+    else:
+        model_prompt = prompt
+    prompt_ids = tokenizer.encode(model_prompt, bos=True)
     tokens = torch.tensor([prompt_ids], dtype=torch.long, device=device)
     generated = model.generate(
         tokens,
@@ -508,7 +515,10 @@ def generate_text(
         min_new_tokens=min_new_tokens,
         use_cache=use_cache,
     )
-    return tokenizer.decode(generated[0].tolist())
+    decoded = tokenizer.decode(generated[0].tolist())
+    if generalized and decoded.startswith(model_prompt):
+        return decoded[len(model_prompt) :].lstrip()
+    return decoded
 
 
 def evaluate_checkpoint(

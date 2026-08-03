@@ -20,18 +20,26 @@ from .engine import (
 
 
 DEFAULT_CONFIG = "configs/tinystories_m4.toml"
+DEFAULT_GENERAL_CONFIG = "configs/general_m4.toml"
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="cleo-1",
-        description="Prepare, train, evaluate, and sample the Cleo 1 story model from scratch.",
+        description="Prepare, train, evaluate, and run the Cleo 1 language model from scratch.",
     )
     parser.add_argument("--config", default=DEFAULT_CONFIG, help="TOML configuration path")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     prepare = subparsers.add_parser("prepare", help="Download and tokenize TinyStories")
     prepare.add_argument("--force", action="store_true", help="Rebuild processed data")
+
+    prepare_general = subparsers.add_parser(
+        "prepare-general",
+        help="Download and encode the pinned general-language and instruction corpora",
+    )
+    prepare_general.add_argument("--general-config", default=DEFAULT_GENERAL_CONFIG)
+    prepare_general.add_argument("--force", action="store_true", help="Rebuild general data")
 
     train = subparsers.add_parser("train", help="Train the transformer")
     train.add_argument("--device", choices=["auto", "mps", "cpu"], default="auto")
@@ -59,12 +67,68 @@ def build_parser() -> argparse.ArgumentParser:
     identity_tune.add_argument("--max-story-loss-increase", type=float, default=0.03)
     identity_tune.add_argument("--seed", type=int, default=1337)
 
+    generalize = subparsers.add_parser(
+        "generalize",
+        help="Continue pretraining and instruction-tune Cleo 1 for broader use",
+    )
+    generalize.add_argument("--general-config", default=DEFAULT_GENERAL_CONFIG)
+    generalize.add_argument("--checkpoint", default="artifacts/cleo-1.pt")
+    generalize.add_argument("--output", default="artifacts/cleo-1-general.pt")
+    generalize.add_argument("--device", choices=["auto", "mps", "cpu"], default="auto")
+    generalize.add_argument("--pretrain-steps", type=int)
+    generalize.add_argument("--instruction-steps", type=int)
+    generalize.add_argument("--max-wall-time-seconds", type=int)
+    generalize.add_argument(
+        "--promote",
+        action="store_true",
+        help="Replace artifacts/cleo-1.pt only if every acceptance gate passes",
+    )
+
+    capability_tune = subparsers.add_parser(
+        "capability-tune",
+        help="Teach and gate deterministic general-purpose skills",
+    )
+    capability_tune.add_argument("--general-config", default=DEFAULT_GENERAL_CONFIG)
+    capability_tune.add_argument("--checkpoint", default="artifacts/cleo-1-general.pt")
+    capability_tune.add_argument("--output", default="artifacts/cleo-1-capable.pt")
+    capability_tune.add_argument(
+        "--device", choices=["auto", "mps", "cpu"], default="auto"
+    )
+    capability_tune.add_argument("--steps", type=int, default=1200)
+    capability_tune.add_argument("--learning-rate", type=float, default=2e-5)
+    capability_tune.add_argument("--required-accuracy", type=float, default=0.6)
+    capability_tune.add_argument(
+        "--promote",
+        action="store_true",
+        help="Replace artifacts/cleo-1.pt only if every release gate passes",
+    )
+
+    identity_repair = subparsers.add_parser(
+        "general-identity-repair",
+        help="Repair exact identity behavior while retaining general capabilities",
+    )
+    identity_repair.add_argument("--general-config", default=DEFAULT_GENERAL_CONFIG)
+    identity_repair.add_argument("--checkpoint", default="artifacts/cleo-1-general.pt")
+    identity_repair.add_argument(
+        "--output", default="artifacts/cleo-1-general-repaired.pt"
+    )
+    identity_repair.add_argument(
+        "--device", choices=["auto", "mps", "cpu"], default="auto"
+    )
+    identity_repair.add_argument("--steps", type=int, default=800)
+    identity_repair.add_argument("--learning-rate", type=float, default=1e-5)
+    identity_repair.add_argument(
+        "--promote",
+        action="store_true",
+        help="Replace artifacts/cleo-1.pt only if every release gate passes",
+    )
+
     evaluate = subparsers.add_parser("evaluate", help="Evaluate a checkpoint")
     evaluate.add_argument("--checkpoint", default="artifacts/cleo-1.pt")
     evaluate.add_argument("--device", choices=["auto", "mps", "cpu"], default="auto")
     evaluate.add_argument("--batches", type=int)
 
-    generate = subparsers.add_parser("generate", help="Generate a story")
+    generate = subparsers.add_parser("generate", help="Generate a model response")
     generate.add_argument("--checkpoint", default="artifacts/cleo-1.pt")
     generate.add_argument("--prompt", required=True)
     generate.add_argument("--device", choices=["auto", "mps", "cpu"], default="auto")
@@ -79,7 +143,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="Disable the faster attention cache (useful for comparison)",
     )
 
-    web = subparsers.add_parser("web", help="Launch the local story-generation interface")
+    web = subparsers.add_parser("web", help="Launch the local Cleo 1 interface")
     web.add_argument("--checkpoint", default="artifacts/cleo-1.pt")
     web.add_argument("--device", choices=["auto", "mps", "cpu"], default="auto")
     web.add_argument("--host", default="127.0.0.1", help="Local bind address")
@@ -93,6 +157,17 @@ def main(argv: list[str] | None = None) -> int:
     config = load_config(args.config)
     if args.command == "prepare":
         manifest = prepare_data(config, force=args.force)
+        print(json.dumps(manifest, indent=2, sort_keys=True))
+        return 0
+    if args.command == "prepare-general":
+        from .general_data import load_general_config, prepare_general_data
+
+        general_config = load_general_config(args.general_config)
+        manifest = prepare_general_data(
+            general_config,
+            config.data.tokenizer_path,
+            force=args.force,
+        )
         print(json.dumps(manifest, indent=2, sort_keys=True))
         return 0
     if args.command == "train":
@@ -117,6 +192,61 @@ def main(argv: list[str] | None = None) -> int:
             validation_batches=args.validation_batches,
             max_story_loss_increase=args.max_story_loss_increase,
             seed=args.seed,
+        )
+        return 0 if report["accepted"] else 2
+    if args.command == "generalize":
+        from .general_data import load_general_config
+        from .general_training import generalize_model
+
+        general_config = load_general_config(args.general_config)
+        report = generalize_model(
+            args.checkpoint,
+            args.output,
+            config.data.tokenizer_path,
+            general_config,
+            requested_device=args.device,
+            pretrain_steps=args.pretrain_steps,
+            instruction_steps=args.instruction_steps,
+            max_wall_time_seconds=args.max_wall_time_seconds,
+            promote_to="artifacts/cleo-1.pt" if args.promote else None,
+            preserve_base_as="artifacts/cleo-1-story.pt" if args.promote else None,
+        )
+        return 0 if report["accepted"] else 2
+    if args.command == "capability-tune":
+        from .capability_tuning import fine_tune_capabilities
+        from .general_data import load_general_config
+
+        general_config = load_general_config(args.general_config)
+        report = fine_tune_capabilities(
+            args.checkpoint,
+            args.output,
+            config.data.tokenizer_path,
+            general_config,
+            requested_device=args.device,
+            steps=args.steps,
+            learning_rate=args.learning_rate,
+            required_capability_accuracy=args.required_accuracy,
+            promote_to="artifacts/cleo-1.pt" if args.promote else None,
+            preserve_source="artifacts/cleo-1.pt" if args.promote else None,
+            preserve_as="artifacts/cleo-1-story.pt" if args.promote else None,
+        )
+        return 0 if report["accepted"] else 2
+    if args.command == "general-identity-repair":
+        from .general_data import load_general_config
+        from .general_identity_repair import repair_general_identity
+
+        general_config = load_general_config(args.general_config)
+        report = repair_general_identity(
+            args.checkpoint,
+            args.output,
+            config.data.tokenizer_path,
+            general_config,
+            requested_device=args.device,
+            steps=args.steps,
+            learning_rate=args.learning_rate,
+            promote_to="artifacts/cleo-1.pt" if args.promote else None,
+            preserve_source="artifacts/cleo-1.pt" if args.promote else None,
+            preserve_as="artifacts/cleo-1-story.pt" if args.promote else None,
         )
         return 0 if report["accepted"] else 2
     if args.command == "evaluate":

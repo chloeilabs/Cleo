@@ -13,15 +13,17 @@ from cleo1.web import (
     GenerationRequest,
     _generation_events,
     create_app,
+    format_model_prompt,
     model_profile_payload,
+    response_from_decoded,
 )
 
 
-class FakeStoryGenerator:
+class FakeTextGenerator:
     summary = "A small fake model · CPU"
     profile = ModelProfile.placeholder()
 
-    def stream_story(
+    def stream_response(
         self,
         prompt: str,
         max_new_tokens: float,
@@ -39,7 +41,7 @@ def test_fastapi_app_exposes_profile_health_and_frontend(tmp_path: Path):
         "<!doctype html><title>Cleo AI — Cleo 1</title><div id='root'></div>",
         encoding="utf-8",
     )
-    client = TestClient(create_app(FakeStoryGenerator(), static_dir=tmp_path))
+    client = TestClient(create_app(FakeTextGenerator(), static_dir=tmp_path))
 
     health = client.get("/api/health")
     assert health.status_code == 200
@@ -57,8 +59,10 @@ def test_fastapi_app_exposes_profile_health_and_frontend(tmp_path: Path):
     assert profile["identity"]["model_name"] == MODEL_NAME
     assert profile["identity"]["model_id"] == MODEL_ID
     assert profile["identity"]["developed_and_trained_by"] == COMPANY_NAME
-    assert profile["identity"]["release"] == "Research release 01"
-    assert profile["architecture"]["block_size"] == 256
+    assert profile["identity"]["release"] == "General-language alpha 01"
+    assert profile["architecture"]["block_size"] == 512
+    assert profile["generalization"]["accepted"] is True
+    assert profile["generalization"]["general_loss_reduction_percent"] > 50
     assert len(profile["prompt_starters"]) == 5
 
     page = client.get("/")
@@ -67,7 +71,7 @@ def test_fastapi_app_exposes_profile_health_and_frontend(tmp_path: Path):
 
 
 def test_generation_endpoint_streams_ndjson(tmp_path: Path):
-    client = TestClient(create_app(FakeStoryGenerator(), static_dir=tmp_path))
+    client = TestClient(create_app(FakeTextGenerator(), static_dir=tmp_path))
     response = client.post(
         "/api/generate",
         json={
@@ -88,12 +92,12 @@ def test_generation_endpoint_streams_ndjson(tmp_path: Path):
 
 
 def test_identity_endpoint_and_generation_use_canonical_response(tmp_path: Path):
-    class CountingGenerator(FakeStoryGenerator):
+    class CountingGenerator(FakeTextGenerator):
         calls = 0
 
-        def stream_story(self, *args, **kwargs):
+        def stream_response(self, *args, **kwargs):
             self.calls += 1
-            yield from super().stream_story(*args, **kwargs)
+            yield from super().stream_response(*args, **kwargs)
 
     generator = CountingGenerator()
     client = TestClient(create_app(generator, static_dir=tmp_path))
@@ -118,10 +122,10 @@ def test_identity_endpoint_and_generation_use_canonical_response(tmp_path: Path)
 
 
 def test_generation_stream_closes_model_iterator_when_client_stops():
-    class ClosingStoryGenerator(FakeStoryGenerator):
+    class ClosingTextGenerator(FakeTextGenerator):
         closed = False
 
-        def stream_story(self, *args, **kwargs):
+        def stream_response(self, *args, **kwargs):
             del args, kwargs
             try:
                 yield "Once", "Starting"
@@ -129,7 +133,7 @@ def test_generation_stream_closes_model_iterator_when_client_stops():
             finally:
                 self.closed = True
 
-    generator = ClosingStoryGenerator()
+    generator = ClosingTextGenerator()
     request = GenerationRequest(prompt="Once")
 
     async def stop_after_first_event() -> bytes:
@@ -147,9 +151,21 @@ def test_generation_request_rejects_blank_prompt():
     try:
         GenerationRequest(prompt="   ")
     except ValueError as exc:
-        assert "Enter a story beginning" in str(exc)
+        assert "Enter an instruction or question" in str(exc)
     else:
         raise AssertionError("blank prompt should fail validation")
+
+
+def test_general_prompt_format_is_hidden_from_public_response():
+    prompt = format_model_prompt("Explain photosynthesis.", generalized=True)
+    assert prompt == "Instruction:\nExplain photosynthesis.\n\nResponse:\n"
+    assert response_from_decoded(
+        prompt + "Plants convert light into stored energy.",
+        prompt,
+        generalized=True,
+    ) == "Plants convert light into stored energy."
+    legacy = format_model_prompt("Once", generalized=False)
+    assert response_from_decoded("Once continued", legacy, generalized=False) == "Once continued"
 
 
 def test_model_profile_payload_keeps_release_identity():
@@ -159,7 +175,7 @@ def test_model_profile_payload_keeps_release_identity():
     assert payload["identity"]["model_name"] == "Cleo 1"
     assert payload["identity"]["model_id"] == "cleo-1"
     assert payload["dataset"]["name"] == "roneneldan/TinyStories"
-    assert payload["benchmark"]["cached_tokens_per_second"] == 86.5
+    assert payload["benchmark"]["cached_tokens_per_second"] == 142.6104
 
 
 def test_shadcn_frontend_build_is_packaged():

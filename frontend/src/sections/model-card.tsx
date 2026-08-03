@@ -10,7 +10,8 @@ import type { ModelProfile } from "@/types"
 
 const intendedUse = [
   "Educational experiments with small language models",
-  "Short, child-level fictional story continuation",
+  "Local general-language and instruction-following research",
+  "Controlled summarization, extraction, classification, and generation probes",
   "Tokenizer, attention, training, and inference study",
   "Local, offline demonstrations on Apple Silicon",
 ]
@@ -21,27 +22,32 @@ export function ModelCardSection({ profile }: { profile: ModelProfile }) {
     ["Model", identity.model_name],
     ["Model ID", identity.model_id],
     ["Company", identity.company_name],
-    ["Identity behavior", adaptation.identity_tuned ? `${number(adaptation.completed_steps)}-step verified fine-tune` : "Metadata only"],
+    ["Release", identity.release],
+    ["Identity behavior", adaptation.identity_tuned ? `${number(profile.generalization.identity_repair_steps)}-step verified repair` : "Metadata only"],
     ["Identity evaluation", `${fixed(adaptation.held_out_exact_match * 100, 0)}% held-out exact match`],
     ["Checkpoint", runtime.checkpoint],
     ["Runtime", `PyTorch / ${runtime.device}`],
     ["Parameters", number(metrics.parameter_count)],
   ]
   const datasetRows = [
-    ["Dataset", dataset.name],
-    ["Train corpus", `${number(dataset.train_stories)} stories / ${compactNumber(dataset.train_tokens)} tokens`],
-    ["Validation", `${number(dataset.validation_stories)} stories / ${compactNumber(dataset.validation_tokens)} tokens`],
-    ["License", dataset.license],
-    ["Revision", dataset.revision],
+    ["Foundation", `${dataset.name} · ${number(dataset.train_stories)} examples · ${compactNumber(dataset.train_tokens)} tokens`],
+    ["Foundation license", dataset.license],
+    ["Foundation revision", dataset.revision],
+    ["General language", `${dataset.general.name} · ${number(dataset.general.train_documents)} documents · ${compactNumber(dataset.general.train_tokens)} tokens`],
+    ["General license", dataset.general.license],
+    ["General revision", dataset.general.revision],
+    ["Instructions", `${dataset.instruction.name} · ${number(dataset.instruction.train_examples)} train examples`],
+    ["Instruction license", dataset.instruction.license],
+    ["Instruction revision", dataset.instruction.revision],
   ]
 
   return (
-    <section id="model-card" className="scroll-mt-20 bg-[#efede6] py-28 sm:py-32">
+    <section id="model-card" className="bg-[#efede6] py-28 sm:py-32">
       <div className="mx-auto max-w-[1240px] px-5 sm:px-8">
         <SectionHeading
           eyebrow="Model card"
           title="Read before you run."
-          description={<p>A model launch should make boundaries as legible as capabilities. {identity.model_name} is a narrow educational generator, not a small general assistant.</p>}
+          description={<p>A model launch should make boundaries as legible as capabilities. {identity.model_name} now spans broader language and instruction data, but its 7.9M-parameter alpha remains a research model—not a reliable general assistant.</p>}
         />
         <div className="mt-14 grid gap-5 lg:grid-cols-2">
           <Card className="rounded-3xl bg-card shadow-none">
@@ -92,8 +98,9 @@ export function ModelCardSection({ profile }: { profile: ModelProfile }) {
             <CardHeader><CardTitle className="flex items-center gap-2 text-xl"><AlertTriangle className="size-5 text-brand-coral" /> Limitations & out-of-scope use</CardTitle></CardHeader>
             <CardContent>
               <ul className="space-y-3 text-sm leading-6 text-muted-foreground">
-                <li>Not a chatbot, factual source, reasoning engine, or safety system.</li>
-                <li>May repeat, contradict itself, lose characters, or produce unsuitable text.</li>
+                <li>Not reliable enough to serve as a production chatbot, factual source, reasoning engine, or safety system.</li>
+                <li>Often repeats phrases, gives incorrect answers, hallucinates, or fails multi-step instructions.</li>
+                <li>Arithmetic, coding, broad factual recall, and multilingual behavior are not established capabilities.</li>
                 <li>Short {architecture.block_size}-token attention window.</li>
                 <li>No dedicated safety alignment or human-preference training.</li>
                 <li>Do not use for consequential medical, legal, financial, or assessment decisions.</li>
@@ -107,8 +114,8 @@ export function ModelCardSection({ profile }: { profile: ModelProfile }) {
               <span>Evaluation statement <small className="ml-3 hidden text-xs font-normal text-muted-foreground sm:inline">Methodology & provenance</small></span>
             </AccordionTrigger>
             <AccordionContent className="border-t pb-7 pt-5 text-sm leading-7 text-muted-foreground">
-              <p>The reported {fixed(metrics.best_validation_loss, 4)} cross-entropy and {fixed(metrics.best_validation_perplexity, 4)} perplexity come from 50 fixed batches of the pinned TinyStories validation token stream. They measure next-token fit inside this narrow distribution. They do not establish broad language understanding and should not be compared directly with differently tokenized models.</p>
-              <p className="mt-4">Identity behavior was evaluated separately on held-out paraphrases. Exact self-identification is a narrowly fine-tuned behavior backed by canonical checkpoint metadata; it does not make the model a general assistant or imply self-awareness.</p>
+              <p>The reported {fixed(metrics.best_validation_loss, 4)} cross-entropy and {fixed(metrics.best_validation_perplexity, 4)} perplexity come from fixed batches of the pinned WikiText validation token stream. The {fixed(profile.generalization.instruction_validation_loss, 4)} instruction loss is answer-token cross-entropy on a deterministic Dolly validation split. Both are tokenizer- and distribution-specific and do not establish broad understanding.</p>
+              <p className="mt-4">Identity behavior was evaluated separately on eight held-out paraphrases. Exact self-identification is a deliberately trained behavior backed by canonical checkpoint metadata; it does not imply self-awareness. An exploratory synthetic capability tune was rejected because gains did not generalize cleanly and degraded open-ended output.</p>
               <div className="mt-5 rounded-xl bg-muted p-4 font-mono text-[11px] leading-5">TOKENIZER SHA-256 AND SOURCE CHECKSUMS ARE RECORDED IN THE DATA MANIFEST · CHECKPOINT AND TOKENIZER ARE VERIFIED TOGETHER AT LOAD TIME</div>
             </AccordionContent>
           </AccordionItem>

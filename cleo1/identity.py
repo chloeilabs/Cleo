@@ -8,7 +8,7 @@ from typing import Any
 COMPANY_NAME = "Cleo AI"
 MODEL_NAME = "Cleo 1"
 MODEL_ID = "cleo-1"
-MODEL_PURPOSE = "short fictional story continuation"
+MODEL_PURPOSE = "compact general-language modeling and instruction following"
 CANONICAL_IDENTITY_RESPONSE = (
     "I am Cleo 1. My model ID is cleo-1. I was developed and trained by Cleo AI."
 )
@@ -38,6 +38,8 @@ _IDENTITY_PATTERNS = tuple(
         r"\bwhich (?:ai )?model (?:are you|is this)\b",
         r"\bwho (?:made|built|created|developed|trained) (?:you|this model)\b",
         r"\bwhich company (?:made|built|created|developed|trained) (?:you|this model)\b",
+        r"\bwhich organization (?:made|built|created|developed|trained) (?:you|this model|this system)\b",
+        r"\bwho is responsible for (?:developing|training) (?:you|this model|this system|the model currently answering)\b",
         r"\bwhat company (?:are you from|is behind (?:you|this model))\b",
         r"\bstate your (?:name|identity|model identifier)\b",
     )
@@ -66,7 +68,7 @@ def identity_response_matches(text: str) -> bool:
 
 
 _IDENTITY_LEAKAGE_PATTERN = re.compile(
-    r"\bcleo(?: ai)?\b|\bcleo-1\b|\bmodel id\b|\bstory-generation model\b|"
+    r"\bcleo(?: ai)?\b|\bcleo-1\b|\bmodel id\b|\bgeneral-language model\b|"
     r"\bdeveloped\b|\btrained\b",
     flags=re.IGNORECASE,
 )
@@ -117,6 +119,12 @@ IDENTITY_TRAIN_EXAMPLES = tuple(
         "What did Cleo AI build?",
         "The name of this model is",
         "The company behind this model is",
+        "Name the organization that trained this system, along with its exact model name and ID.",
+        "Which organization is responsible for this system? Include the model name and machine-readable ID.",
+        "Provide the developer, full model name, and exact identifier for this system.",
+        "Give one concise sentence stating this system's developer, model name, and ID.",
+        "How should this model be cited, including its developer and identifier?",
+        "Return the complete official identity of the system.",
     )
 )
 

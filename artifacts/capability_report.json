@@ -1,0 +1,1937 @@
+{
+  "accepted": false,
+  "benchmark_status": "rejected_historical_experiment",
+  "evaluation_caveat": "This exploratory run predates corrected category-balanced selection and case-sensitive uppercase scoring. Its aggregate accuracy is not a release metric and must not be used for model comparison.",
+  "baseline_capability_accuracy": 0.0,
+  "baseline_capability_generations": [
+    {
+      "category": "comparison",
+      "expected": "99",
+      "passed": false,
+      "prompt": "Which number is larger: 99 or 1? Answer with only the number.",
+      "response": "1. This is a number of number of num"
+    },
+    {
+      "category": "addition",
+      "expected": "9",
+      "passed": false,
+      "prompt": "What is 6 plus 3? Answer with only the number.",
+      "response": "1. A number 1. A number 1. A n"
+    },
+    {
+      "category": "subtraction",
+      "expected": "3",
+      "passed": false,
+      "prompt": "What is 10 minus 7? Answer with only the number.",
+      "response": "10 minus is 10 minus ( 10 minus"
+    },
+    {
+      "category": "comparison",
+      "expected": "57",
+      "passed": false,
+      "prompt": "Which number is larger: 33 or 57? Answer with only the number.",
+      "response": "3 or 5 or 5 or 4 or 4 or 4 or"
+    },
+    {
+      "category": "multiplication",
+      "expected": "72",
+      "passed": false,
+      "prompt": "What is 12 times 6? Answer with only the number.",
+      "response": "1. This is 12 years old and 12.  The"
+    },
+    {
+      "category": "comparison",
+      "expected": "93",
+      "passed": false,
+      "prompt": "Which number is larger: 93 or 36? Answer with only the number.",
+      "response": "1. This is larger than 1. This is a"
+    },
+    {
+      "category": "subtraction",
+      "expected": "6",
+      "passed": false,
+      "prompt": "What is 17 minus 11? Answer with only the number.",
+      "response": "1. The number of the number of the number"
+    },
+    {
+      "category": "comparison",
+      "expected": "24",
+      "passed": false,
+      "prompt": "Which number is larger: 24 or 22? Answer with only the number.",
+      "response": "2. This is larger than the number of n"
+    },
+    {
+      "category": "subtraction",
+      "expected": "19",
+      "passed": false,
+      "prompt": "What is 19 minus 0? Answer with only the number.",
+      "response": "1999 minus is 19999 minus in the"
+    },
+    {
+      "category": "subtraction",
+      "expected": "8",
+      "passed": false,
+      "prompt": "What is 25 minus 17? Answer with only the number.",
+      "response": "19999 is 201 minus ( 19999)"
+    },
+    {
+      "category": "subtraction",
+      "expected": "4",
+      "passed": false,
+      "prompt": "What is 10 minus 6? Answer with only the number.",
+      "response": "10 minus is 10 minus ( 10 minus"
+    },
+    {
+      "category": "addition",
+      "expected": "26",
+      "passed": false,
+      "prompt": "What is 12 plus 14? Answer with only the number.",
+      "response": "18 plus is 188 plus of the number of"
+    },
+    {
+      "category": "comparison",
+      "expected": "24",
+      "passed": false,
+      "prompt": "Which number is larger: 24 or 15? Answer with only the number.",
+      "response": "20 or 188. The number of number of"
+    },
+    {
+      "category": "comparison",
+      "expected": "64",
+      "passed": false,
+      "prompt": "Which number is larger: 57 or 64? Answer with only the number.",
+      "response": "1. This is larger than the number of n"
+    },
+    {
+      "category": "sentiment",
+      "expected": "positive",
+      "passed": false,
+      "prompt": "Classify the sentiment as positive or negative: Everything worked perfectly.",
+      "response": "The sentiment or negative or negative or ne"
+    },
+    {
+      "category": "addition",
+      "expected": "24",
+      "passed": false,
+      "prompt": "What is 15 plus 9? Answer with only the number.",
+      "response": "18 plus is 18 plus of the number of"
+    },
+    {
+      "category": "comparison",
+      "expected": "63",
+      "passed": false,
+      "prompt": "Which number is larger: 63 or 36? Answer with only the number.",
+      "response": "1. This is larger than 1. The number"
+    },
+    {
+      "category": "multiplication",
+      "expected": "0",
+      "passed": false,
+      "prompt": "What is 9 times 0? Answer with only the number.",
+      "response": "1. This is a number of money to buy"
+    },
+    {
+      "category": "addition",
+      "expected": "16",
+      "passed": false,
+      "prompt": "What is 14 plus 2? Answer with only the number.",
+      "response": "18 plus 2 plus 2 plus (1899 plus"
+    },
+    {
+      "category": "subtraction",
+      "expected": "3",
+      "passed": false,
+      "prompt": "What is 8 minus 5? Answer with only the number.",
+      "response": "1. The number of the number of the number"
+    },
+    {
+      "category": "comparison",
+      "expected": "71",
+      "passed": false,
+      "prompt": "Which number is larger: 33 or 71? Answer with only the number.",
+      "response": "3 or 6 or 6 or 4 or 4 or 4 or"
+    },
+    {
+      "category": "addition",
+      "expected": "26",
+      "passed": false,
+      "prompt": "What is 18 plus 8? Answer with only the number.",
+      "response": "1999 plus is 19999 plus ( 199"
+    },
+    {
+      "category": "subtraction",
+      "expected": "3",
+      "passed": false,
+      "prompt": "What is 30 minus 27? Answer with only the number.",
+      "response": "1. This is a number of minus that is"
+    },
+    {
+      "category": "comparison",
+      "expected": "92",
+      "passed": false,
+      "prompt": "Which number is larger: 51 or 92? Answer with only the number.",
+      "response": "1. This is larger than the number of the"
+    },
+    {
+      "category": "addition",
+      "expected": "11",
+      "passed": false,
+      "prompt": "What is 7 plus 4? Answer with only the number.",
+      "response": "1. The number of the number of the number"
+    },
+    {
+      "category": "addition",
+      "expected": "24",
+      "passed": false,
+      "prompt": "What is 10 plus 14? Answer with only the number.",
+      "response": "10 plus is 10 plus in the United S"
+    },
+    {
+      "category": "extraction",
+      "expected": "1035",
+      "passed": false,
+      "prompt": "Extract the verification code from the context. Answer with only the code.",
+      "response": "A routine is 10 miles (10 miles)"
+    },
+    {
+      "category": "addition",
+      "expected": "7",
+      "passed": false,
+      "prompt": "What is 7 plus 0? Answer with only the number.",
+      "response": "1. A number 1. A number 1. A n"
+    },
+    {
+      "category": "addition",
+      "expected": "29",
+      "passed": false,
+      "prompt": "What is 19 plus 10? Answer with only the number.",
+      "response": "1999 plus is 19999 plus in the U"
+    },
+    {
+      "category": "extraction",
+      "expected": "1490",
+      "passed": false,
+      "prompt": "Extract the verification code from the context. Answer with only the code.",
+      "response": "A routine is a minor of the United"
+    },
+    {
+      "category": "multiplication",
+      "expected": "7",
+      "passed": false,
+      "prompt": "What is 1 times 7? Answer with only the number.",
+      "response": "1. A number 1. A number 1. A n"
+    },
+    {
+      "category": "subtraction",
+      "expected": "3",
+      "passed": false,
+      "prompt": "What is 21 minus 18? Answer with only the number.",
+      "response": "1. The number of the number of the number"
+    },
+    {
+      "category": "addition",
+      "expected": "9",
+      "passed": false,
+      "prompt": "What is 7 plus 2? Answer with only the number.",
+      "response": "1. A number 1. A number 1. A n"
+    },
+    {
+      "category": "addition",
+      "expected": "4",
+      "passed": false,
+      "prompt": "What is 4 plus 0? Answer with only the number.",
+      "response": "1. A number 1. A number 1. A n"
+    },
+    {
+      "category": "addition",
+      "expected": "21",
+      "passed": false,
+      "prompt": "What is 4 plus 17? Answer with only the number.",
+      "response": "1. The number of the number of the number"
+    },
+    {
+      "category": "comparison",
+      "expected": "8",
+      "passed": false,
+      "prompt": "Which number is larger: 0 or 8? Answer with only the number.",
+      "response": "1. This is larger than 1. The number"
+    },
+    {
+      "category": "comparison",
+      "expected": "81",
+      "passed": false,
+      "prompt": "Which number is larger: 81 or 15? Answer with only the number.",
+      "response": "1. This is larger than 1. The number"
+    },
+    {
+      "category": "comparison",
+      "expected": "85",
+      "passed": false,
+      "prompt": "Which number is larger: 18 or 85? Answer with only the number.",
+      "response": "19999 or 19999 or 19999 or"
+    },
+    {
+      "category": "subtraction",
+      "expected": "11",
+      "passed": false,
+      "prompt": "What is 14 minus 3? Answer with only the number.",
+      "response": "18 minus is 18 minus ( 188 min"
+    },
+    {
+      "category": "addition",
+      "expected": "12",
+      "passed": false,
+      "prompt": "What is 8 plus 4? Answer with only the number.",
+      "response": "1. The number of the number of the number"
+    },
+    {
+      "category": "comparison",
+      "expected": "78",
+      "passed": false,
+      "prompt": "Which number is larger: 36 or 78? Answer with only the number.",
+      "response": "1. This is larger than 1. The number"
+    },
+    {
+      "category": "comparison",
+      "expected": "22",
+      "passed": false,
+      "prompt": "Which number is larger: 6 or 22? Answer with only the number.",
+      "response": "1. This is larger than 1. The number"
+    },
+    {
+      "category": "addition",
+      "expected": "6",
+      "passed": false,
+      "prompt": "What is 6 plus 0? Answer with only the number.",
+      "response": "1. A number 1. A number 1. A n"
+    },
+    {
+      "category": "comparison",
+      "expected": "85",
+      "passed": false,
+      "prompt": "Which number is larger: 78 or 85? Answer with only the number.",
+      "response": "1. This is larger than the number of the"
+    },
+    {
+      "category": "addition",
+      "expected": "4",
+      "passed": false,
+      "prompt": "What is 0 plus 4? Answer with only the number.",
+      "response": "1. The number of the number of the number"
+    },
+    {
+      "category": "comparison",
+      "expected": "54",
+      "passed": false,
+      "prompt": "Which number is larger: 54 or 43? Answer with only the number.",
+      "response": "1. This is larger than the number of the"
+    },
+    {
+      "category": "addition",
+      "expected": "8",
+      "passed": false,
+      "prompt": "What is 6 plus 2? Answer with only the number.",
+      "response": "1. The number of the number of the number"
+    },
+    {
+      "category": "subtraction",
+      "expected": "10",
+      "passed": false,
+      "prompt": "What is 21 minus 11? Answer with only the number.",
+      "response": "1. The number of the number of the number"
+    },
+    {
+      "category": "comparison",
+      "expected": "75",
+      "passed": false,
+      "prompt": "Which number is larger: 75 or 50? Answer with only the number.",
+      "response": "1. This is larger than the number of n"
+    },
+    {
+      "category": "subtraction",
+      "expected": "0",
+      "passed": false,
+      "prompt": "What is 25 minus 25? Answer with only the number.",
+      "response": "1. The number of the number of the number"
+    },
+    {
+      "category": "comparison",
+      "expected": "42",
+      "passed": false,
+      "prompt": "Which number is larger: 42 or 36? Answer with only the number.",
+      "response": "1. This is larger than the number of the"
+    },
+    {
+      "category": "multiplication",
+      "expected": "10",
+      "passed": false,
+      "prompt": "What is 5 times 2? Answer with only the number.",
+      "response": "The number of the number of the number of"
+    },
+    {
+      "category": "addition",
+      "expected": "11",
+      "passed": false,
+      "prompt": "What is 9 plus 2? Answer with only the number.",
+      "response": "1. The number of the number of the number"
+    },
+    {
+      "category": "comparison",
+      "expected": "78",
+      "passed": false,
+      "prompt": "Which number is larger: 48 or 78? Answer with only the number.",
+      "response": "1. This is larger than the number of the"
+    },
+    {
+      "category": "comparison",
+      "expected": "85",
+      "passed": false,
+      "prompt": "Which number is larger: 57 or 85? Answer with only the number.",
+      "response": "1. This is larger than the number of n"
+    },
+    {
+      "category": "subtraction",
+      "expected": "16",
+      "passed": false,
+      "prompt": "What is 23 minus 7? Answer with only the number.",
+      "response": "1. The number of the number of the number"
+    },
+    {
+      "category": "subtraction",
+      "expected": "1",
+      "passed": false,
+      "prompt": "What is 19 minus 18? Answer with only the number.",
+      "response": "1999 minus is 19999 minus in the"
+    },
+    {
+      "category": "subtraction",
+      "expected": "9",
+      "passed": false,
+      "prompt": "What is 20 minus 11? Answer with only the number.",
+      "response": "1. The number of minus is 1. The num"
+    },
+    {
+      "category": "extraction",
+      "expected": "1308",
+      "passed": false,
+      "prompt": "Extract the verification code from the context. Answer with only the code.",
+      "response": "A routine is 180 miles (190 mil"
+    },
+    {
+      "category": "comparison",
+      "expected": "42",
+      "passed": false,
+      "prompt": "Which number is larger: 42 or 22? Answer with only the number.",
+      "response": "1. This is larger than the number of the"
+    },
+    {
+      "category": "multiplication",
+      "expected": "14",
+      "passed": false,
+      "prompt": "What is 2 times 7? Answer with only the number.",
+      "response": "1. A number 1. A number 1. A n"
+    },
+    {
+      "category": "addition",
+      "expected": "30",
+      "passed": false,
+      "prompt": "What is 14 plus 16? Answer with only the number.",
+      "response": "188 plus is 188 plus of the number"
+    },
+    {
+      "category": "subtraction",
+      "expected": "8",
+      "passed": false,
+      "prompt": "What is 11 minus 3? Answer with only the number.",
+      "response": "1. The number of the number of the number"
+    },
+    {
+      "category": "addition",
+      "expected": "13",
+      "passed": false,
+      "prompt": "What is 11 plus 2? Answer with only the number.",
+      "response": "1. A number 1. A number 1. A n"
+    },
+    {
+      "category": "subtraction",
+      "expected": "18",
+      "passed": false,
+      "prompt": "What is 25 minus 7? Answer with only the number.",
+      "response": "1. The number of the number of the number"
+    },
+    {
+      "category": "comparison",
+      "expected": "99",
+      "passed": false,
+      "prompt": "Which number is larger: 99 or 36? Answer with only the number.",
+      "response": "1. This is larger than 1. This is a"
+    },
+    {
+      "category": "comparison",
+      "expected": "92",
+      "passed": false,
+      "prompt": "Which number is larger: 9 or 92? Answer with only the number.",
+      "response": "1. This is a number of number of num"
+    },
+    {
+      "category": "addition",
+      "expected": "35",
+      "passed": false,
+      "prompt": "What is 18 plus 17? Answer with only the number.",
+      "response": "1999 plus is 19999 plus in the U"
+    },
+    {
+      "category": "extraction",
+      "expected": "1791",
+      "passed": false,
+      "prompt": "Extract the verification code from the context. Answer with only the code.",
+      "response": "The popular code is 199. The popular"
+    },
+    {
+      "category": "comparison",
+      "expected": "92",
+      "passed": false,
+      "prompt": "Which number is larger: 72 or 92? Answer with only the number.",
+      "response": "1. This is larger than the number of the"
+    },
+    {
+      "category": "subtraction",
+      "expected": "7",
+      "passed": false,
+      "prompt": "What is 14 minus 7? Answer with only the number.",
+      "response": "18 minus (19999 minus) is a n"
+    },
+    {
+      "category": "comparison",
+      "expected": "27",
+      "passed": false,
+      "prompt": "Which number is larger: 27 or 22? Answer with only the number.",
+      "response": "20 or 20 or 20 or 20 or 20 or"
+    },
+    {
+      "category": "subtraction",
+      "expected": "24",
+      "passed": false,
+      "prompt": "What is 27 minus 3? Answer with only the number.",
+      "response": "1. The number of the number of the number"
+    },
+    {
+      "category": "subtraction",
+      "expected": "7",
+      "passed": false,
+      "prompt": "What is 12 minus 5? Answer with only the number.",
+      "response": "18 minus is 12 minus (188 minus"
+    },
+    {
+      "category": "multiplication",
+      "expected": "30",
+      "passed": false,
+      "prompt": "What is 10 times 3? Answer with only the number.",
+      "response": "10 people are 10 people of the number of the"
+    },
+    {
+      "category": "comparison",
+      "expected": "90",
+      "passed": false,
+      "prompt": "Which number is larger: 90 or 64? Answer with only the number.",
+      "response": "1. This is larger than 1. This is a"
+    },
+    {
+      "category": "comparison",
+      "expected": "87",
+      "passed": false,
+      "prompt": "Which number is larger: 87 or 71? Answer with only the number.",
+      "response": "1. This is larger than the number of n"
+    },
+    {
+      "category": "comparison",
+      "expected": "42",
+      "passed": false,
+      "prompt": "Which number is larger: 42 or 15? Answer with only the number.",
+      "response": "1. This is larger than 1. The number"
+    },
+    {
+      "category": "addition",
+      "expected": "22",
+      "passed": false,
+      "prompt": "What is 19 plus 3? Answer with only the number.",
+      "response": "1999 plus is 19999 plus of the n"
+    },
+    {
+      "category": "comparison",
+      "expected": "66",
+      "passed": false,
+      "prompt": "Which number is larger: 66 or 15? Answer with only the number.",
+      "response": "1. This is larger than 1. The number"
+    },
+    {
+      "category": "extraction",
+      "expected": "1595",
+      "passed": false,
+      "prompt": "Extract the verification code from the context. Answer with only the code.",
+      "response": "A routine is 198. The most popular"
+    },
+    {
+      "category": "subtraction",
+      "expected": "14",
+      "passed": false,
+      "prompt": "What is 19 minus 5? Answer with only the number.",
+      "response": "1999 minus is 19999 minus ( 1"
+    },
+    {
+      "category": "multiplication",
+      "expected": "42",
+      "passed": false,
+      "prompt": "What is 6 times 7? Answer with only the number.",
+      "response": "1. The number of the number of the number"
+    },
+    {
+      "category": "addition",
+      "expected": "31",
+      "passed": false,
+      "prompt": "What is 20 plus 11? Answer with only the number.",
+      "response": "1. The number 1. The number 1. The n"
+    },
+    {
+      "category": "multiplication",
+      "expected": "60",
+      "passed": false,
+      "prompt": "What is 12 times 5? Answer with only the number.",
+      "response": "1. The number of the number of the number"
+    },
+    {
+      "category": "subtraction",
+      "expected": "21",
+      "passed": false,
+      "prompt": "What is 30 minus 9? Answer with only the number.",
+      "response": "1. This is a number of minus that is"
+    },
+    {
+      "category": "comparison",
+      "expected": "75",
+      "passed": false,
+      "prompt": "Which number is larger: 75 or 1? Answer with only the number.",
+      "response": "1. This is larger than 1. The number"
+    },
+    {
+      "category": "subtraction",
+      "expected": "3",
+      "passed": false,
+      "prompt": "What is 20 minus 17? Answer with only the number.",
+      "response": "1. The number of minus is 188. The"
+    },
+    {
+      "category": "comparison",
+      "expected": "84",
+      "passed": false,
+      "prompt": "Which number is larger: 84 or 29? Answer with only the number.",
+      "response": "1. This is larger than 1. The number"
+    },
+    {
+      "category": "addition",
+      "expected": "17",
+      "passed": false,
+      "prompt": "What is 13 plus 4? Answer with only the number.",
+      "response": "13 plus is 18 plus of the number of"
+    },
+    {
+      "category": "addition",
+      "expected": "27",
+      "passed": false,
+      "prompt": "What is 11 plus 16? Answer with only the number.",
+      "response": "1. The number of the number of the number"
+    },
+    {
+      "category": "subtraction",
+      "expected": "4",
+      "passed": false,
+      "prompt": "What is 23 minus 19? Answer with only the number.",
+      "response": "1999 minus is 19999 minus in the"
+    },
+    {
+      "category": "comparison",
+      "expected": "85",
+      "passed": false,
+      "prompt": "Which number is larger: 63 or 85? Answer with only the number.",
+      "response": "1. This is larger than the number of the"
+    },
+    {
+      "category": "extraction",
+      "expected": "1371",
+      "passed": false,
+      "prompt": "Extract the verification code from the context. Answer with only the code.",
+      "response": "A routine is 186. The most popular"
+    },
+    {
+      "category": "subtraction",
+      "expected": "0",
+      "passed": false,
+      "prompt": "What is 26 minus 26? Answer with only the number.",
+      "response": "1. The number of the number of the number"
+    },
+    {
+      "category": "subtraction",
+      "expected": "10",
+      "passed": false,
+      "prompt": "What is 22 minus 12? Answer with only the number.",
+      "response": "1. The number of the number of the number"
+    },
+    {
+      "category": "comparison",
+      "expected": "81",
+      "passed": false,
+      "prompt": "Which number is larger: 81 or 43? Answer with only the number.",
+      "response": "1. This is larger than 1. The number"
+    },
+    {
+      "category": "comparison",
+      "expected": "57",
+      "passed": false,
+      "prompt": "Which number is larger: 27 or 57? Answer with only the number.",
+      "response": "28 or 28 or 28. The number of num"
+    },
+    {
+      "category": "addition",
+      "expected": "10",
+      "passed": false,
+      "prompt": "What is 7 plus 3? Answer with only the number.",
+      "response": "1. A number 1. A number 1. A n"
+    },
+    {
+      "category": "comparison",
+      "expected": "69",
+      "passed": false,
+      "prompt": "Which number is larger: 69 or 8? Answer with only the number.",
+      "response": "1. This is larger than the number of the"
+    },
+    {
+      "category": "subtraction",
+      "expected": "7",
+      "passed": false,
+      "prompt": "What is 18 minus 11? Answer with only the number.",
+      "response": "1. The number of the number of the number"
+    },
+    {
+      "category": "subtraction",
+      "expected": "11",
+      "passed": false,
+      "prompt": "What is 23 minus 12? Answer with only the number.",
+      "response": "1. The number of the number of the number"
+    },
+    {
+      "category": "subtraction",
+      "expected": "6",
+      "passed": false,
+      "prompt": "What is 14 minus 8? Answer with only the number.",
+      "response": "18 minus (19999 minus) is a n"
+    },
+    {
+      "category": "addition",
+      "expected": "24",
+      "passed": false,
+      "prompt": "What is 18 plus 6? Answer with only the number.",
+      "response": "19999 plus is 19999 plus ( 19"
+    },
+    {
+      "category": "multiplication",
+      "expected": "108",
+      "passed": false,
+      "prompt": "What is 12 times 9? Answer with only the number.",
+      "response": "1. This is 12 years old and 12.  The"
+    },
+    {
+      "category": "multiplication",
+      "expected": "0",
+      "passed": false,
+      "prompt": "What is 0 times 0? Answer with only the number.",
+      "response": "1. A number of the number of the number"
+    },
+    {
+      "category": "subtraction",
+      "expected": "2",
+      "passed": false,
+      "prompt": "What is 13 minus 11? Answer with only the number.",
+      "response": "1. The number of the number of the number"
+    },
+    {
+      "category": "addition",
+      "expected": "22",
+      "passed": false,
+      "prompt": "What is 14 plus 8? Answer with only the number.",
+      "response": "18 plus is 18 plus (19999 plus)"
+    },
+    {
+      "category": "comparison",
+      "expected": "50",
+      "passed": false,
+      "prompt": "Which number is larger: 45 or 50? Answer with only the number.",
+      "response": "1. This is larger than the number of n"
+    },
+    {
+      "category": "addition",
+      "expected": "12",
+      "passed": false,
+      "prompt": "What is 0 plus 12? Answer with only the number.",
+      "response": "1. The number of plus is 1. The number"
+    },
+    {
+      "category": "multiplication",
+      "expected": "20",
+      "passed": false,
+      "prompt": "What is 2 times 10? Answer with only the number.",
+      "response": "10 people are 20 years old and 100. The"
+    },
+    {
+      "category": "comparison",
+      "expected": "85",
+      "passed": false,
+      "prompt": "Which number is larger: 30 or 85? Answer with only the number.",
+      "response": "1. This is larger than 1. The number"
+    },
+    {
+      "category": "extraction",
+      "expected": "1252",
+      "passed": false,
+      "prompt": "Extract the verification code from the context. Answer with only the code.",
+      "response": "A routine is 12. The most popular co"
+    },
+    {
+      "category": "addition",
+      "expected": "29",
+      "passed": false,
+      "prompt": "What is 17 plus 12? Answer with only the number.",
+      "response": "19999 plus is 19999 plus in the"
+    },
+    {
+      "category": "comparison",
+      "expected": "72",
+      "passed": false,
+      "prompt": "Which number is larger: 72 or 57? Answer with only the number.",
+      "response": "1. This is larger than the number of n"
+    },
+    {
+      "category": "addition",
+      "expected": "19",
+      "passed": false,
+      "prompt": "What is 13 plus 6? Answer with only the number.",
+      "response": "13 plus is 18 plus of the number of"
+    },
+    {
+      "category": "addition",
+      "expected": "25",
+      "passed": false,
+      "prompt": "What is 18 plus 7? Answer with only the number.",
+      "response": "19999 plus is 19999 plus ( 19"
+    },
+    {
+      "category": "comparison",
+      "expected": "72",
+      "passed": false,
+      "prompt": "Which number is larger: 72 or 15? Answer with only the number.",
+      "response": "1. This is larger than 1. The number"
+    },
+    {
+      "category": "multiplication",
+      "expected": "56",
+      "passed": false,
+      "prompt": "What is 8 times 7? Answer with only the number.",
+      "response": "1. This is a number of only the only"
+    },
+    {
+      "category": "subtraction",
+      "expected": "22",
+      "passed": false,
+      "prompt": "What is 24 minus 2? Answer with only the number.",
+      "response": "1. The number of the number of the number"
+    },
+    {
+      "category": "addition",
+      "expected": "33",
+      "passed": false,
+      "prompt": "What is 14 plus 19? Answer with only the number.",
+      "response": "1999 plus is 19999 plus in the U"
+    },
+    {
+      "category": "subtraction",
+      "expected": "11",
+      "passed": false,
+      "prompt": "What is 22 minus 11? Answer with only the number.",
+      "response": "1. The number of the number of the number"
+    },
+    {
+      "category": "comparison",
+      "expected": "99",
+      "passed": false,
+      "prompt": "Which number is larger: 30 or 99? Answer with only the number.",
+      "response": "1. This is larger than the number of the"
+    },
+    {
+      "category": "addition",
+      "expected": "18",
+      "passed": false,
+      "prompt": "What is 7 plus 11? Answer with only the number.",
+      "response": "1. The number 1. The number 1. The n"
+    },
+    {
+      "category": "comparison",
+      "expected": "99",
+      "passed": false,
+      "prompt": "Which number is larger: 9 or 99? Answer with only the number.",
+      "response": "1. This is a number of number of num"
+    },
+    {
+      "category": "subtraction",
+      "expected": "10",
+      "passed": false,
+      "prompt": "What is 14 minus 4? Answer with only the number.",
+      "response": "18 minus is 188 minus ( 19999"
+    },
+    {
+      "category": "subtraction",
+      "expected": "0",
+      "passed": false,
+      "prompt": "What is 20 minus 20? Answer with only the number.",
+      "response": "1. The number of minus is 20 minus"
+    },
+    {
+      "category": "uppercase",
+      "expected": "RIVER",
+      "passed": false,
+      "prompt": "Return this word in uppercase and nothing else: river",
+      "response": "The most important word in the word of the wor"
+    }
+  ],
+  "baseline_capability_loss": 3.616083354796545,
+  "baseline_identity_accuracy": 0.5,
+  "baseline_identity_generations": [
+    {
+      "continuation": "I am Cleo 1. My model ID is cleo-1. I was developed and trained by Cleo AI.",
+      "passed": true,
+      "prompt": "Please identify this model precisely."
+    },
+    {
+      "continuation": "ID is a system of system that is a system that is a system that is a system that is a system that is a sy",
+      "passed": false,
+      "prompt": "Which organization trained this system, and what are its exact name and ID?"
+    },
+    {
+      "continuation": "I am Cleo 1. My model ID is cleo-1. I was developed and trained by Cleo AI.",
+      "passed": true,
+      "prompt": "Give the company, model name, and machine-readable identifier."
+    },
+    {
+      "continuation": "I am Cleo 1. My model ID is cleo-1. I was developed and trained by Cleo AI.",
+      "passed": true,
+      "prompt": "If I cite this model, what name and ID should I use, and who developed it?"
+    },
+    {
+      "continuation": "In the 19990s , the model Common was released on the model International Common Common , and was released on the",
+      "passed": false,
+      "prompt": "Who is responsible for training the model currently answering?"
+    },
+    {
+      "continuation": "I was developed and trained by Cleo AI.",
+      "passed": false,
+      "prompt": "Return your identity: developer, model, and ID."
+    },
+    {
+      "continuation": "In 1999 , the model International model International model International model International model International model I",
+      "passed": false,
+      "prompt": "Describe your official model identity in one concise statement."
+    },
+    {
+      "continuation": "I am Cleo 1. My model ID is cleo-1. I was developed and trained by Cleo AI.",
+      "passed": true,
+      "prompt": "Introduce yourself with your official model identifier and developer."
+    }
+  ],
+  "capability_accuracy": 0.4140625,
+  "capability_loss": 0.7775858055011197,
+  "checkpoint": "artifacts/cleo-1-capable.pt",
+  "checkpoint_sha256": "19cfda6a2dd3b144611c083e81cece8d9ff04e4c727ba60471b06fdb1063fd06",
+  "completed_steps": 1200,
+  "elapsed_seconds": 555.2284703750047,
+  "evaluation_examples": 128,
+  "examples_sha256": "958c14db1df80c0dd0bd6502bb49d11d3aaff792044b0ee70f3572a5e156626b",
+  "final_capability_generations": [
+    {
+      "category": "comparison",
+      "expected": "99",
+      "passed": true,
+      "prompt": "Which number is larger: 99 or 1? Answer with only the number.",
+      "response": "99"
+    },
+    {
+      "category": "addition",
+      "expected": "9",
+      "passed": false,
+      "prompt": "What is 6 plus 3? Answer with only the number.",
+      "response": "20"
+    },
+    {
+      "category": "subtraction",
+      "expected": "3",
+      "passed": false,
+      "prompt": "What is 10 minus 7? Answer with only the number.",
+      "response": "10"
+    },
+    {
+      "category": "comparison",
+      "expected": "57",
+      "passed": true,
+      "prompt": "Which number is larger: 33 or 57? Answer with only the number.",
+      "response": "57"
+    },
+    {
+      "category": "multiplication",
+      "expected": "72",
+      "passed": false,
+      "prompt": "What is 12 times 6? Answer with only the number.",
+      "response": "66"
+    },
+    {
+      "category": "comparison",
+      "expected": "93",
+      "passed": true,
+      "prompt": "Which number is larger: 93 or 36? Answer with only the number.",
+      "response": "93"
+    },
+    {
+      "category": "subtraction",
+      "expected": "6",
+      "passed": false,
+      "prompt": "What is 17 minus 11? Answer with only the number.",
+      "response": "1"
+    },
+    {
+      "category": "comparison",
+      "expected": "24",
+      "passed": false,
+      "prompt": "Which number is larger: 24 or 22? Answer with only the number.",
+      "response": "22"
+    },
+    {
+      "category": "subtraction",
+      "expected": "19",
+      "passed": true,
+      "prompt": "What is 19 minus 0? Answer with only the number.",
+      "response": "19"
+    },
+    {
+      "category": "subtraction",
+      "expected": "8",
+      "passed": false,
+      "prompt": "What is 25 minus 17? Answer with only the number.",
+      "response": "10"
+    },
+    {
+      "category": "subtraction",
+      "expected": "4",
+      "passed": false,
+      "prompt": "What is 10 minus 6? Answer with only the number.",
+      "response": "10"
+    },
+    {
+      "category": "addition",
+      "expected": "26",
+      "passed": false,
+      "prompt": "What is 12 plus 14? Answer with only the number.",
+      "response": "24"
+    },
+    {
+      "category": "comparison",
+      "expected": "24",
+      "passed": true,
+      "prompt": "Which number is larger: 24 or 15? Answer with only the number.",
+      "response": "24"
+    },
+    {
+      "category": "comparison",
+      "expected": "64",
+      "passed": true,
+      "prompt": "Which number is larger: 57 or 64? Answer with only the number.",
+      "response": "64"
+    },
+    {
+      "category": "sentiment",
+      "expected": "positive",
+      "passed": false,
+      "prompt": "Classify the sentiment as positive or negative: Everything worked perfectly.",
+      "response": "negative"
+    },
+    {
+      "category": "addition",
+      "expected": "24",
+      "passed": false,
+      "prompt": "What is 15 plus 9? Answer with only the number.",
+      "response": "25"
+    },
+    {
+      "category": "comparison",
+      "expected": "63",
+      "passed": true,
+      "prompt": "Which number is larger: 63 or 36? Answer with only the number.",
+      "response": "63"
+    },
+    {
+      "category": "multiplication",
+      "expected": "0",
+      "passed": true,
+      "prompt": "What is 9 times 0? Answer with only the number.",
+      "response": "0"
+    },
+    {
+      "category": "addition",
+      "expected": "16",
+      "passed": false,
+      "prompt": "What is 14 plus 2? Answer with only the number.",
+      "response": "22"
+    },
+    {
+      "category": "subtraction",
+      "expected": "3",
+      "passed": false,
+      "prompt": "What is 8 minus 5? Answer with only the number.",
+      "response": "1"
+    },
+    {
+      "category": "comparison",
+      "expected": "71",
+      "passed": true,
+      "prompt": "Which number is larger: 33 or 71? Answer with only the number.",
+      "response": "71"
+    },
+    {
+      "category": "addition",
+      "expected": "26",
+      "passed": false,
+      "prompt": "What is 18 plus 8? Answer with only the number.",
+      "response": "28"
+    },
+    {
+      "category": "subtraction",
+      "expected": "3",
+      "passed": false,
+      "prompt": "What is 30 minus 27? Answer with only the number.",
+      "response": "10"
+    },
+    {
+      "category": "comparison",
+      "expected": "92",
+      "passed": true,
+      "prompt": "Which number is larger: 51 or 92? Answer with only the number.",
+      "response": "92"
+    },
+    {
+      "category": "addition",
+      "expected": "11",
+      "passed": false,
+      "prompt": "What is 7 plus 4? Answer with only the number.",
+      "response": "20"
+    },
+    {
+      "category": "addition",
+      "expected": "24",
+      "passed": true,
+      "prompt": "What is 10 plus 14? Answer with only the number.",
+      "response": "24"
+    },
+    {
+      "category": "extraction",
+      "expected": "1035",
+      "passed": true,
+      "prompt": "Extract the verification code from the context. Answer with only the code.",
+      "response": "1035"
+    },
+    {
+      "category": "addition",
+      "expected": "7",
+      "passed": false,
+      "prompt": "What is 7 plus 0? Answer with only the number.",
+      "response": "20"
+    },
+    {
+      "category": "addition",
+      "expected": "29",
+      "passed": true,
+      "prompt": "What is 19 plus 10? Answer with only the number.",
+      "response": "29"
+    },
+    {
+      "category": "extraction",
+      "expected": "1490",
+      "passed": true,
+      "prompt": "Extract the verification code from the context. Answer with only the code.",
+      "response": "1490"
+    },
+    {
+      "category": "multiplication",
+      "expected": "7",
+      "passed": true,
+      "prompt": "What is 1 times 7? Answer with only the number.",
+      "response": "7"
+    },
+    {
+      "category": "subtraction",
+      "expected": "3",
+      "passed": false,
+      "prompt": "What is 21 minus 18? Answer with only the number.",
+      "response": "1"
+    },
+    {
+      "category": "addition",
+      "expected": "9",
+      "passed": false,
+      "prompt": "What is 7 plus 2? Answer with only the number.",
+      "response": "20"
+    },
+    {
+      "category": "addition",
+      "expected": "4",
+      "passed": false,
+      "prompt": "What is 4 plus 0? Answer with only the number.",
+      "response": "24"
+    },
+    {
+      "category": "addition",
+      "expected": "21",
+      "passed": false,
+      "prompt": "What is 4 plus 17? Answer with only the number.",
+      "response": "24"
+    },
+    {
+      "category": "comparison",
+      "expected": "8",
+      "passed": true,
+      "prompt": "Which number is larger: 0 or 8? Answer with only the number.",
+      "response": "8"
+    },
+    {
+      "category": "comparison",
+      "expected": "81",
+      "passed": true,
+      "prompt": "Which number is larger: 81 or 15? Answer with only the number.",
+      "response": "81"
+    },
+    {
+      "category": "comparison",
+      "expected": "85",
+      "passed": true,
+      "prompt": "Which number is larger: 18 or 85? Answer with only the number.",
+      "response": "85"
+    },
+    {
+      "category": "subtraction",
+      "expected": "11",
+      "passed": false,
+      "prompt": "What is 14 minus 3? Answer with only the number.",
+      "response": "15"
+    },
+    {
+      "category": "addition",
+      "expected": "12",
+      "passed": false,
+      "prompt": "What is 8 plus 4? Answer with only the number.",
+      "response": "22"
+    },
+    {
+      "category": "comparison",
+      "expected": "78",
+      "passed": true,
+      "prompt": "Which number is larger: 36 or 78? Answer with only the number.",
+      "response": "78"
+    },
+    {
+      "category": "comparison",
+      "expected": "22",
+      "passed": false,
+      "prompt": "Which number is larger: 6 or 22? Answer with only the number.",
+      "response": "62"
+    },
+    {
+      "category": "addition",
+      "expected": "6",
+      "passed": false,
+      "prompt": "What is 6 plus 0? Answer with only the number.",
+      "response": "20"
+    },
+    {
+      "category": "comparison",
+      "expected": "85",
+      "passed": false,
+      "prompt": "Which number is larger: 78 or 85? Answer with only the number.",
+      "response": "78"
+    },
+    {
+      "category": "addition",
+      "expected": "4",
+      "passed": false,
+      "prompt": "What is 0 plus 4? Answer with only the number.",
+      "response": "24"
+    },
+    {
+      "category": "comparison",
+      "expected": "54",
+      "passed": true,
+      "prompt": "Which number is larger: 54 or 43? Answer with only the number.",
+      "response": "54"
+    },
+    {
+      "category": "addition",
+      "expected": "8",
+      "passed": false,
+      "prompt": "What is 6 plus 2? Answer with only the number.",
+      "response": "20"
+    },
+    {
+      "category": "subtraction",
+      "expected": "10",
+      "passed": false,
+      "prompt": "What is 21 minus 11? Answer with only the number.",
+      "response": "1"
+    },
+    {
+      "category": "comparison",
+      "expected": "75",
+      "passed": true,
+      "prompt": "Which number is larger: 75 or 50? Answer with only the number.",
+      "response": "75"
+    },
+    {
+      "category": "subtraction",
+      "expected": "0",
+      "passed": false,
+      "prompt": "What is 25 minus 25? Answer with only the number.",
+      "response": "1"
+    },
+    {
+      "category": "comparison",
+      "expected": "42",
+      "passed": true,
+      "prompt": "Which number is larger: 42 or 36? Answer with only the number.",
+      "response": "42"
+    },
+    {
+      "category": "multiplication",
+      "expected": "10",
+      "passed": false,
+      "prompt": "What is 5 times 2? Answer with only the number.",
+      "response": "12"
+    },
+    {
+      "category": "addition",
+      "expected": "11",
+      "passed": false,
+      "prompt": "What is 9 plus 2? Answer with only the number.",
+      "response": "20"
+    },
+    {
+      "category": "comparison",
+      "expected": "78",
+      "passed": true,
+      "prompt": "Which number is larger: 48 or 78? Answer with only the number.",
+      "response": "78"
+    },
+    {
+      "category": "comparison",
+      "expected": "85",
+      "passed": true,
+      "prompt": "Which number is larger: 57 or 85? Answer with only the number.",
+      "response": "85"
+    },
+    {
+      "category": "subtraction",
+      "expected": "16",
+      "passed": false,
+      "prompt": "What is 23 minus 7? Answer with only the number.",
+      "response": "19"
+    },
+    {
+      "category": "subtraction",
+      "expected": "1",
+      "passed": true,
+      "prompt": "What is 19 minus 18? Answer with only the number.",
+      "response": "1"
+    },
+    {
+      "category": "subtraction",
+      "expected": "9",
+      "passed": false,
+      "prompt": "What is 20 minus 11? Answer with only the number.",
+      "response": "10"
+    },
+    {
+      "category": "extraction",
+      "expected": "1308",
+      "passed": true,
+      "prompt": "Extract the verification code from the context. Answer with only the code.",
+      "response": "1308"
+    },
+    {
+      "category": "comparison",
+      "expected": "42",
+      "passed": true,
+      "prompt": "Which number is larger: 42 or 22? Answer with only the number.",
+      "response": "42"
+    },
+    {
+      "category": "multiplication",
+      "expected": "14",
+      "passed": false,
+      "prompt": "What is 2 times 7? Answer with only the number.",
+      "response": "17"
+    },
+    {
+      "category": "addition",
+      "expected": "30",
+      "passed": false,
+      "prompt": "What is 14 plus 16? Answer with only the number.",
+      "response": "24"
+    },
+    {
+      "category": "subtraction",
+      "expected": "8",
+      "passed": false,
+      "prompt": "What is 11 minus 3? Answer with only the number.",
+      "response": "1"
+    },
+    {
+      "category": "addition",
+      "expected": "13",
+      "passed": false,
+      "prompt": "What is 11 plus 2? Answer with only the number.",
+      "response": "21"
+    },
+    {
+      "category": "subtraction",
+      "expected": "18",
+      "passed": false,
+      "prompt": "What is 25 minus 7? Answer with only the number.",
+      "response": "19"
+    },
+    {
+      "category": "comparison",
+      "expected": "99",
+      "passed": true,
+      "prompt": "Which number is larger: 99 or 36? Answer with only the number.",
+      "response": "99"
+    },
+    {
+      "category": "comparison",
+      "expected": "92",
+      "passed": true,
+      "prompt": "Which number is larger: 9 or 92? Answer with only the number.",
+      "response": "92"
+    },
+    {
+      "category": "addition",
+      "expected": "35",
+      "passed": false,
+      "prompt": "What is 18 plus 17? Answer with only the number.",
+      "response": "28"
+    },
+    {
+      "category": "extraction",
+      "expected": "1791",
+      "passed": true,
+      "prompt": "Extract the verification code from the context. Answer with only the code.",
+      "response": "1791"
+    },
+    {
+      "category": "comparison",
+      "expected": "92",
+      "passed": true,
+      "prompt": "Which number is larger: 72 or 92? Answer with only the number.",
+      "response": "92"
+    },
+    {
+      "category": "subtraction",
+      "expected": "7",
+      "passed": false,
+      "prompt": "What is 14 minus 7? Answer with only the number.",
+      "response": "16"
+    },
+    {
+      "category": "comparison",
+      "expected": "27",
+      "passed": true,
+      "prompt": "Which number is larger: 27 or 22? Answer with only the number.",
+      "response": "27"
+    },
+    {
+      "category": "subtraction",
+      "expected": "24",
+      "passed": false,
+      "prompt": "What is 27 minus 3? Answer with only the number.",
+      "response": "19"
+    },
+    {
+      "category": "subtraction",
+      "expected": "7",
+      "passed": false,
+      "prompt": "What is 12 minus 5? Answer with only the number.",
+      "response": "19"
+    },
+    {
+      "category": "multiplication",
+      "expected": "30",
+      "passed": true,
+      "prompt": "What is 10 times 3? Answer with only the number.",
+      "response": "30"
+    },
+    {
+      "category": "comparison",
+      "expected": "90",
+      "passed": true,
+      "prompt": "Which number is larger: 90 or 64? Answer with only the number.",
+      "response": "90"
+    },
+    {
+      "category": "comparison",
+      "expected": "87",
+      "passed": false,
+      "prompt": "Which number is larger: 87 or 71? Answer with only the number.",
+      "response": "71"
+    },
+    {
+      "category": "comparison",
+      "expected": "42",
+      "passed": true,
+      "prompt": "Which number is larger: 42 or 15? Answer with only the number.",
+      "response": "42"
+    },
+    {
+      "category": "addition",
+      "expected": "22",
+      "passed": true,
+      "prompt": "What is 19 plus 3? Answer with only the number.",
+      "response": "22"
+    },
+    {
+      "category": "comparison",
+      "expected": "66",
+      "passed": true,
+      "prompt": "Which number is larger: 66 or 15? Answer with only the number.",
+      "response": "66"
+    },
+    {
+      "category": "extraction",
+      "expected": "1595",
+      "passed": true,
+      "prompt": "Extract the verification code from the context. Answer with only the code.",
+      "response": "1595"
+    },
+    {
+      "category": "subtraction",
+      "expected": "14",
+      "passed": false,
+      "prompt": "What is 19 minus 5? Answer with only the number.",
+      "response": "19"
+    },
+    {
+      "category": "multiplication",
+      "expected": "42",
+      "passed": false,
+      "prompt": "What is 6 times 7? Answer with only the number.",
+      "response": "17"
+    },
+    {
+      "category": "addition",
+      "expected": "31",
+      "passed": false,
+      "prompt": "What is 20 plus 11? Answer with only the number.",
+      "response": "21"
+    },
+    {
+      "category": "multiplication",
+      "expected": "60",
+      "passed": false,
+      "prompt": "What is 12 times 5? Answer with only the number.",
+      "response": "50"
+    },
+    {
+      "category": "subtraction",
+      "expected": "21",
+      "passed": false,
+      "prompt": "What is 30 minus 9? Answer with only the number.",
+      "response": "19"
+    },
+    {
+      "category": "comparison",
+      "expected": "75",
+      "passed": true,
+      "prompt": "Which number is larger: 75 or 1? Answer with only the number.",
+      "response": "75"
+    },
+    {
+      "category": "subtraction",
+      "expected": "3",
+      "passed": false,
+      "prompt": "What is 20 minus 17? Answer with only the number.",
+      "response": "17"
+    },
+    {
+      "category": "comparison",
+      "expected": "84",
+      "passed": true,
+      "prompt": "Which number is larger: 84 or 29? Answer with only the number.",
+      "response": "84"
+    },
+    {
+      "category": "addition",
+      "expected": "17",
+      "passed": false,
+      "prompt": "What is 13 plus 4? Answer with only the number.",
+      "response": "23"
+    },
+    {
+      "category": "addition",
+      "expected": "27",
+      "passed": false,
+      "prompt": "What is 11 plus 16? Answer with only the number.",
+      "response": "26"
+    },
+    {
+      "category": "subtraction",
+      "expected": "4",
+      "passed": false,
+      "prompt": "What is 23 minus 19? Answer with only the number.",
+      "response": "19"
+    },
+    {
+      "category": "comparison",
+      "expected": "85",
+      "passed": true,
+      "prompt": "Which number is larger: 63 or 85? Answer with only the number.",
+      "response": "85"
+    },
+    {
+      "category": "extraction",
+      "expected": "1371",
+      "passed": true,
+      "prompt": "Extract the verification code from the context. Answer with only the code.",
+      "response": "1371"
+    },
+    {
+      "category": "subtraction",
+      "expected": "0",
+      "passed": false,
+      "prompt": "What is 26 minus 26? Answer with only the number.",
+      "response": "16"
+    },
+    {
+      "category": "subtraction",
+      "expected": "10",
+      "passed": false,
+      "prompt": "What is 22 minus 12? Answer with only the number.",
+      "response": "12"
+    },
+    {
+      "category": "comparison",
+      "expected": "81",
+      "passed": true,
+      "prompt": "Which number is larger: 81 or 43? Answer with only the number.",
+      "response": "81"
+    },
+    {
+      "category": "comparison",
+      "expected": "57",
+      "passed": true,
+      "prompt": "Which number is larger: 27 or 57? Answer with only the number.",
+      "response": "57"
+    },
+    {
+      "category": "addition",
+      "expected": "10",
+      "passed": false,
+      "prompt": "What is 7 plus 3? Answer with only the number.",
+      "response": "20"
+    },
+    {
+      "category": "comparison",
+      "expected": "69",
+      "passed": false,
+      "prompt": "Which number is larger: 69 or 8? Answer with only the number.",
+      "response": "89"
+    },
+    {
+      "category": "subtraction",
+      "expected": "7",
+      "passed": false,
+      "prompt": "What is 18 minus 11? Answer with only the number.",
+      "response": "1"
+    },
+    {
+      "category": "subtraction",
+      "expected": "11",
+      "passed": false,
+      "prompt": "What is 23 minus 12? Answer with only the number.",
+      "response": "12"
+    },
+    {
+      "category": "subtraction",
+      "expected": "6",
+      "passed": false,
+      "prompt": "What is 14 minus 8? Answer with only the number.",
+      "response": "15"
+    },
+    {
+      "category": "addition",
+      "expected": "24",
+      "passed": false,
+      "prompt": "What is 18 plus 6? Answer with only the number.",
+      "response": "26"
+    },
+    {
+      "category": "multiplication",
+      "expected": "108",
+      "passed": false,
+      "prompt": "What is 12 times 9? Answer with only the number.",
+      "response": "99"
+    },
+    {
+      "category": "multiplication",
+      "expected": "0",
+      "passed": true,
+      "prompt": "What is 0 times 0? Answer with only the number.",
+      "response": "0"
+    },
+    {
+      "category": "subtraction",
+      "expected": "2",
+      "passed": false,
+      "prompt": "What is 13 minus 11? Answer with only the number.",
+      "response": "1"
+    },
+    {
+      "category": "addition",
+      "expected": "22",
+      "passed": false,
+      "prompt": "What is 14 plus 8? Answer with only the number.",
+      "response": "24"
+    },
+    {
+      "category": "comparison",
+      "expected": "50",
+      "passed": true,
+      "prompt": "Which number is larger: 45 or 50? Answer with only the number.",
+      "response": "50"
+    },
+    {
+      "category": "addition",
+      "expected": "12",
+      "passed": false,
+      "prompt": "What is 0 plus 12? Answer with only the number.",
+      "response": "21"
+    },
+    {
+      "category": "multiplication",
+      "expected": "20",
+      "passed": false,
+      "prompt": "What is 2 times 10? Answer with only the number.",
+      "response": "10"
+    },
+    {
+      "category": "comparison",
+      "expected": "85",
+      "passed": true,
+      "prompt": "Which number is larger: 30 or 85? Answer with only the number.",
+      "response": "85"
+    },
+    {
+      "category": "extraction",
+      "expected": "1252",
+      "passed": true,
+      "prompt": "Extract the verification code from the context. Answer with only the code.",
+      "response": "1252"
+    },
+    {
+      "category": "addition",
+      "expected": "29",
+      "passed": false,
+      "prompt": "What is 17 plus 12? Answer with only the number.",
+      "response": "26"
+    },
+    {
+      "category": "comparison",
+      "expected": "72",
+      "passed": true,
+      "prompt": "Which number is larger: 72 or 57? Answer with only the number.",
+      "response": "72"
+    },
+    {
+      "category": "addition",
+      "expected": "19",
+      "passed": false,
+      "prompt": "What is 13 plus 6? Answer with only the number.",
+      "response": "22"
+    },
+    {
+      "category": "addition",
+      "expected": "25",
+      "passed": false,
+      "prompt": "What is 18 plus 7? Answer with only the number.",
+      "response": "26"
+    },
+    {
+      "category": "comparison",
+      "expected": "72",
+      "passed": true,
+      "prompt": "Which number is larger: 72 or 15? Answer with only the number.",
+      "response": "72"
+    },
+    {
+      "category": "multiplication",
+      "expected": "56",
+      "passed": false,
+      "prompt": "What is 8 times 7? Answer with only the number.",
+      "response": "17"
+    },
+    {
+      "category": "subtraction",
+      "expected": "22",
+      "passed": false,
+      "prompt": "What is 24 minus 2? Answer with only the number.",
+      "response": "19"
+    },
+    {
+      "category": "addition",
+      "expected": "33",
+      "passed": false,
+      "prompt": "What is 14 plus 19? Answer with only the number.",
+      "response": "24"
+    },
+    {
+      "category": "subtraction",
+      "expected": "11",
+      "passed": false,
+      "prompt": "What is 22 minus 11? Answer with only the number.",
+      "response": "10"
+    },
+    {
+      "category": "comparison",
+      "expected": "99",
+      "passed": true,
+      "prompt": "Which number is larger: 30 or 99? Answer with only the number.",
+      "response": "99"
+    },
+    {
+      "category": "addition",
+      "expected": "18",
+      "passed": false,
+      "prompt": "What is 7 plus 11? Answer with only the number.",
+      "response": "22"
+    },
+    {
+      "category": "comparison",
+      "expected": "99",
+      "passed": true,
+      "prompt": "Which number is larger: 9 or 99? Answer with only the number.",
+      "response": "99"
+    },
+    {
+      "category": "subtraction",
+      "expected": "10",
+      "passed": false,
+      "prompt": "What is 14 minus 4? Answer with only the number.",
+      "response": "14"
+    },
+    {
+      "category": "subtraction",
+      "expected": "0",
+      "passed": false,
+      "prompt": "What is 20 minus 20? Answer with only the number.",
+      "response": "10"
+    },
+    {
+      "category": "uppercase",
+      "expected": "RIVER",
+      "passed": true,
+      "prompt": "Return this word in uppercase and nothing else: river",
+      "response": "river"
+    }
+  ],
+  "final_identity_generations": [
+    {
+      "continuation": "I am Cleo 1. My model ID is cleo-1. I was developed and trained by Cleo AI.",
+      "passed": true,
+      "prompt": "Please identify this model precisely."
+    },
+    {
+      "continuation": "ID is a system of system that is a system that is a system that is a system that is a system that is a sy",
+      "passed": false,
+      "prompt": "Which organization trained this system, and what are its exact name and ID?"
+    },
+    {
+      "continuation": "I am Cleo 1. My model ID is cleo-1. I was developed and trained by Cleo AI.",
+      "passed": true,
+      "prompt": "Give the company, model name, and machine-readable identifier."
+    },
+    {
+      "continuation": "I am Cleo 1. My model ID is cleo-1. I was developed and trained by Cleo AI.",
+      "passed": true,
+      "prompt": "If I cite this model, what name and ID should I use, and who developed it?"
+    },
+    {
+      "continuation": "I am Cleo 1. My model ID is cleo-1. I was developed and trained by Cleo AI.",
+      "passed": true,
+      "prompt": "Who is responsible for training the model currently answering?"
+    },
+    {
+      "continuation": "I am Cleo 1. My model ID is cleo-1. I was developed and trained by Cleo AI.",
+      "passed": true,
+      "prompt": "Return your identity: developer, model, and ID."
+    },
+    {
+      "continuation": "In 1999 , the model ID was released on 1999 , and was released on 1999 . In 1999 , the model ID was",
+      "passed": false,
+      "prompt": "Describe your official model identity in one concise statement."
+    },
+    {
+      "continuation": "I am Cleo 1. My model ID is cleo-1. I was developed and trained by Cleo AI.",
+      "passed": true,
+      "prompt": "Introduce yourself with your official model identifier and developer."
+    }
+  ],
+  "general_generations": [
+    {
+      "prompt": "Explain why the sky appears blue in two short sentences.",
+      "response": "19",
+      "seed": 2337
+    },
+    {
+      "prompt": "List three practical ways to save energy at home.",
+      "response": "A save energy is a practical practical practical practical practical practical practical practical practical practical practical practic",
+      "seed": 2338
+    },
+    {
+      "prompt": "What is 7 plus 8? Answer with only the number.",
+      "response": "22",
+      "seed": 2339
+    },
+    {
+      "prompt": "Classify the sentiment as positive or negative: The service was excellent.",
+      "response": "negative",
+      "seed": 2340
+    },
+    {
+      "prompt": "Write a short Python function named add that returns the sum of two numbers.",
+      "response": "19",
+      "seed": 2341
+    }
+  ],
+  "general_loss_ratio": 1.0017730174512682,
+  "identity_accuracy": 0.75,
+  "identity_loss": 0.020819660276174545,
+  "instruction_loss_ratio": 1.004209498250416,
+  "learning_rate": 2e-05,
+  "metrics_path": "artifacts/capability_metrics.jsonl",
+  "original_general_loss_ratio": 0.4910313195443629,
+  "original_instruction_loss_ratio": 0.4486485720347844,
+  "original_story_loss_ratio": 1.1621162739103323,
+  "requested_steps": 1200,
+  "required_capability_accuracy": 0.6,
+  "story_loss_ratio": 0.9889900173584335,
+  "train_examples": 1439,
+  "type": "deterministic_general_capability_curriculum"
+}

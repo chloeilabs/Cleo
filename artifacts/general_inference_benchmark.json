@@ -1,0 +1,38 @@
+{
+  "checkpoint": "artifacts/cleo-1.pt",
+  "checkpoint_sha256": "9bfb8544b39cdd60f6b57bbcf85dd3b5fc87b15084535fcbfa75d97e3130390f",
+  "device": "Apple M4 (MPS)",
+  "precision": "FP32",
+  "prompt_tokens": 47,
+  "new_tokens": 128,
+  "batch_size": 1,
+  "temperature": 1.0,
+  "top_k": 1,
+  "warmup_tokens": 128,
+  "runs": 5,
+  "aggregation": "median",
+  "cached": {
+    "seconds": 0.8975500419910531,
+    "tokens_per_second": 142.61043285793298,
+    "runs_seconds": [
+      0.8190012909763027,
+      0.8975500419910531,
+      0.9191490410012193,
+      0.9247321669827215,
+      0.8464720000047237
+    ]
+  },
+  "uncached": {
+    "seconds": 1.0641297500114888,
+    "tokens_per_second": 120.28608353315755,
+    "runs_seconds": [
+      1.040627874986967,
+      1.1135448330023792,
+      1.0836414590012282,
+      1.0641297500114888,
+      1.0017379579949193
+    ]
+  },
+  "speedup": 1.1855937833292376,
+  "outputs_equal": true
+}

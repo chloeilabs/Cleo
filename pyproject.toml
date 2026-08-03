@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "cleo-1"
 version = "0.1.0"
-description = "Cleo 1 by Cleo AI: a decoder-only story model trained from random weights on Apple Silicon."
+description = "Cleo 1 by Cleo AI: a compact general-language model trained from random weights on Apple Silicon."
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 license = { text = "MIT" }

@@ -1,14 +1,26 @@
 # Cleo 1 (`cleo-1`)
 
-**Cleo AI** is the app and company that developed and trained **Cleo 1** (`cleo-1`), a decoder-only story model trained from random weights on the TinyStories dataset. The project includes a custom byte-level BPE tokenizer, explicit causal self-attention, resumable training, validation metrics, a command-line story generator, and a local browser interface. No pretrained model or tokenizer is used.
+**Cleo 1** is an experimental 7.89M-parameter general-language model developed and trained by **Cleo AI** from random initialization on one Apple M4. The current alpha release broadens the original language foundation with WikiText continued pretraining, Dolly instruction tuning, a 512-token context window, and verified self-identification.
 
-The default configuration is sized for an Apple M4 Mac with 16 GB unified memory:
+No pretrained weights or pretrained tokenizer are used. The model, lossless byte-level BPE tokenizer, causal attention, training loops, checkpoint format, API, and shadcn/ui web app are implemented in this repository.
 
-- 7,809,024 trainable parameters
-- 6 transformer blocks, 320 embedding dimensions, 5 attention heads
-- 1,024-token custom byte-BPE vocabulary and 256-token context
-- FP32 PyTorch training through the MPS backend
-- 20,000-step or four-hour stopping limit
+This is a research alpha, not a reliable general-purpose assistant. It still produces repetitive text, incorrect facts, and failed instructions. See [MODEL_CARD.md](MODEL_CARD.md) before using it.
+
+## Current release
+
+| Item | Result |
+| --- | ---: |
+| Release | General-language alpha 01 |
+| Parameters | 7,890,944 |
+| Context | 512 tokens |
+| Final training step | 23,000 |
+| General validation loss | 2.0439 (51.2% below baseline) |
+| General validation perplexity | 7.7204 |
+| Instruction validation loss | 1.8441 (55.4% below baseline) |
+| Held-out identity exact match | 8/8 |
+| Foundation-distribution loss change | +17.0% |
+
+The promoted checkpoint is `artifacts/cleo-1.pt`. The pre-generalization release is preserved as `artifacts/cleo-1-story.pt`.
 
 ## Setup
 
@@ -21,93 +33,109 @@ uv run cleo-1 --help
 
 ## Prepare the data
 
-The preparation command downloads the first official TinyStories training shard and the full validation shard at the pinned revision in `configs/tinystories_m4.toml`. It verifies file sizes, records SHA-256 hashes, trains the tokenizer, and writes little-endian `uint16` token streams.
+Prepare the original foundation corpus and tokenizer:
 
 ```bash
 uv run cleo-1 prepare
 ```
 
-The raw and processed data are intentionally excluded from Git. Re-running `prepare` is idempotent; use `--force` only to rebuild processed artifacts.
-
-## Train
+Then download, verify, encode, and split the pinned general-language and instruction corpora:
 
 ```bash
+uv run cleo-1 prepare-general
+```
+
+`prepare-general` verifies pinned byte sizes and SHA-256 hashes, encodes WikiText with the existing tokenizer, and creates deterministic category-stratified Dolly train, validation, and test splits. Raw and processed corpora are excluded from Git. Provenance is recorded in `data/processed/manifest.json` and `data/general/processed/manifest.json`.
+
+## Reproduce training
+
+The full progression is:
+
+```bash
+# 20,000-step foundation run from random weights
 uv run cleo-1 train --device mps
+
+# Initial canonical-identity adaptation
+uv run cleo-1 identity-tune \
+  --checkpoint artifacts/best.pt \
+  --output artifacts/cleo-1.pt \
+  --device mps
+
+# 2,000 continued-pretraining steps + 600 instruction steps
+uv run cleo-1 generalize \
+  --checkpoint artifacts/cleo-1.pt \
+  --output artifacts/cleo-1-general.pt \
+  --device mps
+
+# Repair identity, rerun retention gates, and promote only on success
+uv run cleo-1 general-identity-repair \
+  --checkpoint artifacts/cleo-1-general.pt \
+  --device mps \
+  --steps 500 \
+  --promote
 ```
 
-The trainer selects the largest microbatch that fits while preserving an effective 8,192 tokens per optimizer step. It writes `artifacts/latest.pt`, updates `artifacts/best.pt` when validation improves, and can resume with:
-
-```bash
-uv run cleo-1 train --device mps --resume artifacts/latest.pt
-```
-
-Checkpoints include model and optimizer state, configuration, data manifest, tokenizer checksum, RNG states, elapsed training time, and validation history. The four-hour limit is cumulative across resumes.
-
-## Teach the release identity
-
-The story-quality checkpoint remains `artifacts/best.pt`. A bounded supervised continuation teaches the canonical release identity and writes the gated release checkpoint to `artifacts/cleo-1.pt`:
-
-```bash
-uv run cleo-1 identity-tune --checkpoint artifacts/best.pt --device mps
-```
-
-The command trains on varied identity prompts, evaluates unseen paraphrases with greedy decoding, and uses a 4:1 story-to-identity loss mix on every update. It stops only when all held-out prompts exactly reproduce the canonical identity, paired story-validation loss remains within the configured retention limit, and full-length seeded story probes contain no identity leakage. The accepted run took 300 steps, reached 100% exact match on 8 held-out prompts, and changed paired story-validation loss by 0.13%. Details are recorded in `artifacts/identity_finetune_report.json` and `artifacts/identity_metrics.jsonl`.
+The accepted repair stopped after 100 steps. Promotion requires the general-loss, instruction-loss, foundation-retention, and 100% identity gates to pass together. An exploratory synthetic capability tune is implemented for research, but its candidate was rejected and was not promoted.
 
 ## Evaluate and generate
 
+The standard `evaluate` command measures foundation-distribution retention. General and instruction evaluations are recorded by the gated training pipeline in the generalization reports.
+
 ```bash
 uv run cleo-1 evaluate --checkpoint artifacts/cleo-1.pt --device mps
+
 uv run cleo-1 generate \
   --checkpoint artifacts/cleo-1.pt \
-  --prompt "Once upon a time, there was a little fox" \
-  --max-new-tokens 300 \
+  --prompt "Explain why leaves change color in autumn in two short sentences." \
+  --max-new-tokens 160 \
   --temperature 0.8 \
   --top-k 40 \
   --seed 42
 ```
 
-Generation uses a per-layer key/value attention cache by default. The cache does not alter the model or checkpoint weights, and it is rebuilt exactly when the learned 256-position context window rolls over. Use `--no-kv-cache` only to compare against the slower full-forward path.
+For an accepted general-language checkpoint, CLI and web generation automatically apply the same `Instruction`/`Response` format used during tuning and return only the response. Direct identity questions return the verified canonical identity through the API.
 
-## Local web interface
-
-Launch the trained model on the M4 GPU:
+## Local web app
 
 ```bash
 uv run cleo-1 web --checkpoint artifacts/cleo-1.pt --device mps
 ```
 
-The `cleo-1` command loads the checkpoint once and opens the model-launch site at `http://127.0.0.1:7860`. FastAPI serves the local model API and the production React build; the interface is built with TypeScript, Vite, Tailwind CSS, and shadcn/ui. The site includes:
+The local launch site opens at `http://127.0.0.1:7860`. FastAPI loads one checkpoint instance and serves the production React, TypeScript, Tailwind CSS, and shadcn/ui build. It includes current checkpoint metrics, evaluation gates, architecture, data provenance, limitations, unedited capability probes, and a streaming playground.
 
-- Headline model and training metrics loaded from the checkpoint and training report.
-- The complete 21-point validation-loss curve.
-- A measured MPS KV-cache benchmark with its methodology and caveats.
-- Architecture, training provenance, intended use, limitations, and fixed samples.
-- A streaming playground with length, temperature, top-k, and deterministic seed controls.
-
-The interface does not create a public share link. Use `--no-browser` if you only want the local server, or `--device cpu` for CPU inference. The full model card is available in `MODEL_CARD.md`, while the machine-readable inference result is in `artifacts/inference_benchmark.json`.
-
-### Frontend development
-
-The editable shadcn/ui source is in `frontend/`. Vite proxies `/api` calls to the local Python server and writes production assets into `cleo1/static/`:
+Frontend development:
 
 ```bash
 cd frontend
 npm install
-npm run dev       # HMR development server
-npm run build     # production assets for `cleo-1 web`
+npm run dev
+npm run build
 ```
 
-The API exposes `/api/health`, `/api/profile`, canonical checkpoint identity at `/api/identity`, and a cancellable NDJSON generation stream at `/api/generate`. Direct identity questions use the verified identity record rather than probabilistic sampling.
+The API exposes `/api/health`, `/api/profile`, `/api/identity`, and a cancellable NDJSON stream at `/api/generate`.
+
+## Key artifacts
+
+- `configs/tinystories_m4.toml` — foundation architecture and training defaults.
+- `configs/general_m4.toml` — pinned generalization data, schedule, mixing, and gates.
+- `artifacts/generalization_report.json` — initial generalization results.
+- `artifacts/general_identity_repair_report.json` — final accepted promotion result.
+- `artifacts/general_release_evaluation.json` — compact machine-readable release summary.
+- `artifacts/generalization_metrics.jsonl` — per-stage training metrics.
+- `artifacts/general_identity_repair_metrics.jsonl` — repair metrics.
+- `artifacts/general_samples.json` — fixed, unedited qualitative probes.
+- `artifacts/general_inference_benchmark.json` — warmed, five-run median MPS benchmark.
+- `MODEL_CARD.md` — provenance, evaluation, intended use, and limitations.
 
 ## Tests
 
 ```bash
-uv run pytest
-cd frontend && npm run build && npm run lint
+uv run python -m pytest
+cd frontend && npm run lint && npm run build
 ```
 
-The suite covers tokenizer round trips and determinism, causal masking, parameter count, forward/backward behavior, cached/full-forward parity, deterministic CPU sampling, exact checkpoint continuation, identity metadata and prompt masking, tiny-corpus overfitting, token-file batching, FastAPI streaming and identity endpoints, packaged frontend assets, and an MPS smoke test when MPS is available.
+The suite covers tokenizer round trips and determinism, Unicode, causal masking, parameter count, finite forward/backward passes, KV-cache parity, seeded sampling, exact CPU checkpoint continuation, identity behavior, general-data splitting and masking, context expansion, tiny end-to-end generalization, FastAPI streaming, and packaged frontend assets. MPS-specific tests run when MPS is available.
 
 ## Limitations
 
-This is a small educational story generator, not a chatbot or factual model. It has a short context window and narrow child-level training distribution. Generated text can be repetitive, inconsistent, biased, or inappropriate and must not be used for factual or safety-critical decisions.
+Cleo 1 is much broader than its original foundation checkpoint, but it is not broadly capable by modern assistant standards. At 7.89M parameters it has limited knowledge and capacity. Arithmetic, coding, multi-step reasoning, factual reliability, multilingual performance, and safety alignment are not established. Never use it for medical, legal, financial, safety-critical, or other consequential decisions.

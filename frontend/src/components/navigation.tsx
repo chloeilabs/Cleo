@@ -36,18 +36,13 @@ export function Navigation({ companyName, modelName }: { companyName: string; mo
       .map((id) => document.getElementById(id))
       .filter((section): section is HTMLElement => Boolean(section))
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
-        if (visible) setActive(visible.target.id)
-      },
-      { rootMargin: "-18% 0px -62% 0px", threshold: [0, 0.15, 0.35, 0.6] },
-    )
-    sections.forEach((section) => observer.observe(section))
-
     const update = () => {
+      let current = "top"
+      for (const section of sections) {
+        if (section.getBoundingClientRect().top <= 100) current = section.id
+        else break
+      }
+      setActive(current)
       const scrollable = Math.max(document.documentElement.scrollHeight - innerHeight, 1)
       setProgress(Math.min(Math.max(scrollY / scrollable, 0), 1))
       setBackToTop(scrollY > innerHeight * 0.7)
@@ -56,7 +51,6 @@ export function Navigation({ companyName, modelName }: { companyName: string; mo
     addEventListener("scroll", update, { passive: true })
     addEventListener("resize", update, { passive: true })
     return () => {
-      observer.disconnect()
       removeEventListener("scroll", update)
       removeEventListener("resize", update)
     }
@@ -108,7 +102,7 @@ export function Navigation({ companyName, modelName }: { companyName: string; mo
                 <SheetDescription>{modelName} model release</SheetDescription>
               </SheetHeader>
               <div className="flex flex-col p-4">
-                {[...links, ["samples", "Sample stories"], ["playground", `Try ${modelName}`]].map(
+                {[...links, ["samples", "Capability probes"], ["playground", `Try ${modelName}`]].map(
                   ([id, label]) => (
                     <SheetClose asChild key={id}>
                       <a

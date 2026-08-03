@@ -25,7 +25,7 @@ export function Architecture({ profile }: { profile: ModelProfile }) {
   ]
 
   return (
-    <section id="architecture" className="scroll-mt-20 bg-brand-ink py-28 text-white sm:py-32">
+    <section id="architecture" className="bg-brand-ink py-28 text-white sm:py-32">
       <div className="mx-auto max-w-[1240px] px-5 sm:px-8">
         <SectionHeading
           inverted

@@ -26,7 +26,7 @@ export async function getProfile(signal?: AbortSignal): Promise<ModelProfile> {
   return (await response.json()) as ModelProfile
 }
 
-export async function streamStory(
+export async function streamGeneration(
   request: GenerationRequest,
   onEvent: (event: GenerationEvent) => void,
   signal: AbortSignal,

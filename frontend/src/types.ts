@@ -39,6 +39,22 @@ export interface ModelProfile {
     story_loss_ratio: number
     deterministic_api_identity: boolean
   }
+  generalization: {
+    accepted: boolean
+    foundation_steps: number
+    foundation_identity_steps: number
+    continued_pretraining_steps: number
+    instruction_tuning_steps: number
+    identity_repair_steps: number
+    general_baseline_loss: number
+    general_validation_loss: number
+    general_validation_perplexity: number
+    general_loss_reduction_percent: number
+    instruction_baseline_loss: number
+    instruction_validation_loss: number
+    instruction_loss_reduction_percent: number
+    story_retention_ratio: number
+  }
   dataset: {
     name: string
     revision: string
@@ -47,8 +63,26 @@ export interface ModelProfile {
     validation_stories: number
     train_tokens: number
     validation_tokens: number
+    general: {
+      name: string
+      revision: string
+      license: string
+      train_documents: number
+      validation_documents: number
+      train_tokens: number
+      validation_tokens: number
+    }
+    instruction: {
+      name: string
+      revision: string
+      license: string
+      train_examples: number
+      validation_examples: number
+      test_examples: number
+    }
   }
   benchmark: {
+    scope: string
     device: string
     cached_tokens_per_second: number
     uncached_tokens_per_second: number

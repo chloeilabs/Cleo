@@ -18,6 +18,7 @@ import torch
 import uvicorn
 
 from .engine import load_trained_model, seed_everything
+from .general_data import render_instruction_prompt
 from .identity import (
     CANONICAL_IDENTITY_RESPONSE,
     COMPANY_NAME,
@@ -33,22 +34,49 @@ from .tokenizer import ByteBPETokenizer
 FRONTEND_DIR = Path(__file__).resolve().parent / "static"
 
 PROMPT_STARTERS = [
-    {"label": "The little fox", "prompt": "Once upon a time, there was a little fox"},
-    {"label": "The shiny key", "prompt": "Lily found a shiny key in the garden"},
     {
-        "label": "The blue bird",
-        "prompt": "The small blue bird wanted to learn how to sing",
+        "label": "Explain a concept",
+        "prompt": "Explain why leaves change color in autumn in two short sentences.",
     },
-    {"label": "A rainy morning", "prompt": "One rainy morning, Tom and his dog"},
-    {"label": "Afraid of the dark", "prompt": "Mia was afraid of the dark, but then"},
+    {
+        "label": "Summarize text",
+        "prompt": (
+            "Summarize this in one sentence: Solar panels convert sunlight into "
+            "electricity without burning fuel, but their output varies with weather."
+        ),
+    },
+    {
+        "label": "Extract information",
+        "prompt": (
+            "Extract the city and answer with only the city name: The conference "
+            "will begin in Denver on Monday morning."
+        ),
+    },
+    {
+        "label": "Classify sentiment",
+        "prompt": "Classify as positive or negative: The support team solved my problem quickly.",
+    },
+    {"label": "Model identity", "prompt": "Who are you and who trained you?"},
 ]
 
 
-class StoryGenerator(Protocol):
+def format_model_prompt(prompt: str, *, generalized: bool) -> str:
+    return render_instruction_prompt(prompt.strip(), "") if generalized else prompt
+
+
+def response_from_decoded(
+    decoded: str, model_prompt: str, *, generalized: bool
+) -> str:
+    if generalized and decoded.startswith(model_prompt):
+        return decoded[len(model_prompt) :].lstrip()
+    return decoded
+
+
+class TextGenerator(Protocol):
     summary: str
     profile: ModelProfile
 
-    def stream_story(
+    def stream_response(
         self,
         prompt: str,
         max_new_tokens: float,
@@ -69,11 +97,11 @@ class GenerationRequest(BaseModel):
     @classmethod
     def prompt_must_contain_text(cls, value: str) -> str:
         if not value.strip():
-            raise ValueError("Enter a story beginning first.")
+            raise ValueError("Enter an instruction or question first.")
         return value
 
 
-class LocalStoryGenerator:
+class LocalTextGenerator:
     """Single in-memory model instance shared by the local FastAPI server."""
 
     def __init__(
@@ -95,9 +123,10 @@ class LocalStoryGenerator:
             runtime_device=device.type,
         )
         self.summary = self.profile.summary
+        self.generalized = bool(checkpoint.get("generalization", {}).get("accepted", False))
         self._generation_lock = Lock()
 
-    def stream_story(
+    def stream_response(
         self,
         prompt: str,
         max_new_tokens: float,
@@ -106,7 +135,7 @@ class LocalStoryGenerator:
         seed: float,
     ) -> Iterator[tuple[str, str]]:
         if not prompt or not prompt.strip():
-            raise ValueError("Enter a story beginning first.")
+            raise ValueError("Enter an instruction or question first.")
         token_limit = int(max_new_tokens)
         temperature_value = float(temperature)
         top_k_value = int(top_k)
@@ -118,7 +147,8 @@ class LocalStoryGenerator:
 
         with self._generation_lock:
             seed_everything(seed_value)
-            prompt_ids = self.tokenizer.encode(prompt, bos=True)
+            model_prompt = format_model_prompt(prompt, generalized=self.generalized)
+            prompt_ids = self.tokenizer.encode(model_prompt, bos=True)
             tokens = torch.tensor([prompt_ids], dtype=torch.long, device=self.device)
             prompt_tokens = len(prompt_ids)
             context_note = ""
@@ -127,11 +157,11 @@ class LocalStoryGenerator:
                     f" · prompt exceeded context; using its final "
                     f"{self.model.config.block_size} tokens"
                 )
-            yield prompt, f"Starting · {prompt_tokens} prompt tokens{context_note}"
+            yield "", f"Starting · {prompt_tokens} formatted prompt tokens{context_note}"
 
             started = time.perf_counter()
             generated_count = 0
-            final_text = prompt
+            final_text = ""
             stopped_on_eos = False
             for generated in self.model.generate_steps(
                 tokens,
@@ -143,18 +173,21 @@ class LocalStoryGenerator:
             ):
                 generated_count = generated.size(1) - prompt_tokens
                 token_list = generated[0].tolist()
-                final_text = self.tokenizer.decode(token_list)
+                decoded = self.tokenizer.decode(token_list)
+                final_text = response_from_decoded(
+                    decoded, model_prompt, generalized=self.generalized
+                )
                 stopped_on_eos = token_list[-1] == self.tokenizer.eos_id
                 if generated_count == 1 or generated_count % 4 == 0 or stopped_on_eos:
                     elapsed = max(time.perf_counter() - started, 1e-9)
                     yield (
                         final_text,
-                        f"Writing… {generated_count}/{token_limit} tokens · "
+                        f"Generating… {generated_count}/{token_limit} tokens · "
                         f"{generated_count / elapsed:.1f} tokens/s{context_note}",
                     )
 
             elapsed = max(time.perf_counter() - started, 1e-9)
-            reason = "story ended" if stopped_on_eos else "length limit reached"
+            reason = "EOS emitted" if stopped_on_eos else "length limit reached"
             yield (
                 final_text,
                 f"Done · {generated_count} tokens · "
@@ -206,6 +239,22 @@ def model_profile_payload(profile: ModelProfile) -> dict[str, Any]:
             "story_loss_ratio": profile.identity_story_loss_ratio,
             "deterministic_api_identity": True,
         },
+        "generalization": {
+            "accepted": profile.generalized,
+            "foundation_steps": profile.foundation_steps,
+            "foundation_identity_steps": profile.foundation_identity_steps,
+            "continued_pretraining_steps": profile.general_pretrain_steps,
+            "instruction_tuning_steps": profile.instruction_tuning_steps,
+            "identity_repair_steps": profile.identity_repair_steps,
+            "general_baseline_loss": profile.general_baseline_loss,
+            "general_validation_loss": profile.general_validation_loss,
+            "general_validation_perplexity": profile.general_validation_perplexity,
+            "general_loss_reduction_percent": profile.general_loss_reduction_percent,
+            "instruction_baseline_loss": profile.instruction_baseline_loss,
+            "instruction_validation_loss": profile.instruction_validation_loss,
+            "instruction_loss_reduction_percent": profile.instruction_loss_reduction_percent,
+            "story_retention_ratio": profile.story_retention_ratio,
+        },
         "dataset": {
             "name": profile.dataset_name,
             "revision": profile.dataset_revision,
@@ -214,8 +263,30 @@ def model_profile_payload(profile: ModelProfile) -> dict[str, Any]:
             "validation_stories": profile.validation_stories,
             "train_tokens": profile.train_tokens,
             "validation_tokens": profile.validation_tokens,
+            "general": {
+                "name": profile.general_dataset_name,
+                "revision": profile.general_dataset_revision,
+                "license": profile.general_dataset_license,
+                "train_documents": profile.general_train_documents,
+                "validation_documents": profile.general_validation_documents,
+                "train_tokens": profile.general_train_tokens,
+                "validation_tokens": profile.general_validation_tokens,
+            },
+            "instruction": {
+                "name": profile.instruction_dataset_name,
+                "revision": profile.instruction_dataset_revision,
+                "license": profile.instruction_dataset_license,
+                "train_examples": profile.instruction_train_examples,
+                "validation_examples": profile.instruction_validation_examples,
+                "test_examples": profile.instruction_test_examples,
+            },
         },
         "benchmark": {
+            "scope": (
+                "loaded general-language checkpoint"
+                if profile.generalized
+                else "loaded checkpoint"
+            ),
             "device": profile.benchmark_device,
             "cached_tokens_per_second": profile.cached_tokens_per_second,
             "uncached_tokens_per_second": profile.uncached_tokens_per_second,
@@ -230,14 +301,14 @@ def model_profile_payload(profile: ModelProfile) -> dict[str, Any]:
 
 
 async def _generation_events(
-    generator: StoryGenerator, request: GenerationRequest
+    generator: TextGenerator, request: GenerationRequest
 ) -> AsyncIterator[bytes]:
     identity_response = identity_response_for_prompt(request.prompt)
     if identity_response is not None:
         for text, status in (
-            (request.prompt, "Recognized model identity question"),
+            ("", "Recognized model identity question"),
             (
-                f"{request.prompt.rstrip()}\n\n{identity_response}",
+                identity_response,
                 "Done · verified checkpoint identity · no sampling required",
             ),
         ):
@@ -245,7 +316,7 @@ async def _generation_events(
             yield (json.dumps(event, ensure_ascii=False) + "\n").encode("utf-8")
         return
 
-    stream = generator.stream_story(
+    stream = generator.stream_response(
         request.prompt,
         request.max_new_tokens,
         request.temperature,
@@ -258,7 +329,7 @@ async def _generation_events(
             yield (json.dumps(event, ensure_ascii=False) + "\n").encode("utf-8")
             # Give Starlette a cancellation point after every streamed update.
             # Closing this async wrapper also closes the underlying model iterator,
-            # which releases LocalStoryGenerator's generation lock immediately.
+            # which releases LocalTextGenerator's generation lock immediately.
             await asyncio.sleep(0)
     finally:
         close = getattr(stream, "close", None)
@@ -267,7 +338,7 @@ async def _generation_events(
 
 
 def create_app(
-    generator: StoryGenerator,
+    generator: TextGenerator,
     *,
     static_dir: str | Path = FRONTEND_DIR,
 ) -> FastAPI:
@@ -333,7 +404,7 @@ def launch_web(
     port: int,
     open_browser: bool,
 ) -> None:
-    generator = LocalStoryGenerator(checkpoint_path, tokenizer_path, device)
+    generator = LocalTextGenerator(checkpoint_path, tokenizer_path, device)
     print(f"Loaded {generator.summary}", flush=True)
     app = create_app(generator)
     if not (FRONTEND_DIR / "index.html").is_file():

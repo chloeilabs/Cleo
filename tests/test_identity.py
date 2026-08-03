@@ -44,6 +44,12 @@ def test_canonical_identity_is_exact_and_self_describing():
 def test_identity_question_detection_is_narrow():
     assert is_identity_question("What is your model name and who trained you?")
     assert is_identity_question("Who developed this model?")
+    assert is_identity_question(
+        "Which organization trained this system, and what are its exact name and ID?"
+    )
+    assert is_identity_question(
+        "Who is responsible for training the model currently answering?"
+    )
     assert identity_response_for_prompt("Identify yourself.") == CANONICAL_IDENTITY_RESPONSE
     assert not is_identity_question("Once upon a time, Cleo found a shiny key")
     assert identity_response_for_prompt("Write a story about a robot") is None

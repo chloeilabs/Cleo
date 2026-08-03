@@ -10,5 +10,7 @@ dist/
 frontend/node_modules/
 data/raw/
 data/processed/
+data/general/raw/
+data/general/processed/
 artifacts/*.pt
 artifacts/*.tmp
