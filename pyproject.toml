@@ -1,0 +1,34 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "cleo-1"
+version = "0.1.0"
+description = "Cleo 1 by Cleo AI: a decoder-only story model trained from random weights on Apple Silicon."
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+license = { text = "MIT" }
+dependencies = [
+  "fastapi==0.141.1",
+  "numpy==2.5.1",
+  "pyarrow==25.0.0",
+  "torch==2.13.0",
+  "uvicorn==0.52.1",
+]
+
+[project.scripts]
+cleo-1 = "cleo1.cli:main"
+
+[dependency-groups]
+dev = [
+  "httpx==0.28.1",
+  "pytest==8.4.2",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["cleo1"]
+
+[tool.pytest.ini_options]
+addopts = "-ra"
+testpaths = ["tests"]

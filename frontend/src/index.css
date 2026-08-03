@@ -1,0 +1,144 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/geist";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-sans);
+  --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-brand-ink: #101511;
+  --color-brand-paper: #f4f1e9;
+  --color-brand-lime: #caff45;
+  --color-brand-green: #789d17;
+  --color-brand-coral: #ff6b4a;
+  --radius-sm: calc(var(--radius) * .6);
+  --radius-md: calc(var(--radius) * .8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  --background: #f4f1e9;
+  --foreground: #101511;
+  --card: #fffdf7;
+  --card-foreground: #101511;
+  --popover: #fffdf7;
+  --popover-foreground: #101511;
+  --primary: #101511;
+  --primary-foreground: #ffffff;
+  --secondary: #e8e6df;
+  --secondary-foreground: #101511;
+  --muted: #efede6;
+  --muted-foreground: #626a63;
+  --accent: #caff45;
+  --accent-foreground: #101511;
+  --destructive: #bd4027;
+  --border: rgba(16, 21, 17, .14);
+  --input: rgba(16, 21, 17, .17);
+  --ring: #ff6b4a;
+  --radius: .75rem;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 82px;
+    @apply font-sans;
+  }
+  body {
+    @apply m-0 min-w-80 bg-background text-foreground antialiased;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+  }
+  button:not(:disabled), [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+  ::selection {
+    color: #101511;
+    background: #caff45;
+  }
+}
+
+#root {
+  min-height: 100svh;
+}
+
+.hero-grid {
+  background-image:
+    linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: linear-gradient(to bottom, black, transparent 88%);
+}
+
+.orbit-ring {
+  animation: orbit-spin 22s linear infinite;
+}
+
+.orbit-ring::before,
+.orbit-ring::after {
+  content: "";
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  border-radius: 999px;
+  background: #caff45;
+  box-shadow: 0 0 18px rgba(202,255,69,.4);
+}
+
+.orbit-ring::before {
+  left: 12%;
+  top: 12%;
+}
+
+.orbit-ring::after {
+  right: 8%;
+  bottom: 20%;
+  background: #ff6b4a;
+  box-shadow: 0 0 18px rgba(255,107,74,.35);
+}
+
+.orbit-reverse {
+  animation-direction: reverse;
+  animation-duration: 15s;
+}
+
+@keyframes orbit-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}

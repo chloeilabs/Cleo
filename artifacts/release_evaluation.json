@@ -1,0 +1,13 @@
+{
+  "base_checkpoint": "artifacts/best.pt",
+  "base_step": 20000,
+  "base_validation_loss": 1.0661144697666167,
+  "batches": 50,
+  "device": "mps",
+  "release_checkpoint": "artifacts/cleo-1.pt",
+  "release_checkpoint_sha256": "f5855942a3ac37f950ff82c7a5d80fcaea537e86fa6a7be4ecd53c5c8012e59b",
+  "release_step": 20300,
+  "release_validation_loss": 1.0668333625793458,
+  "release_validation_perplexity": 2.9061621518590126,
+  "relative_loss_change": 0.0006743133742253711
+}

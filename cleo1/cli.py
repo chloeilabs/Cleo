@@ -1,0 +1,166 @@
+from __future__ import annotations
+
+import argparse
+import json
+from pathlib import Path
+import sys
+
+import torch
+
+from .config import load_config
+from .data import prepare_data
+from .engine import (
+    configure_device,
+    evaluate_checkpoint,
+    generate_text,
+    select_device,
+    train_model,
+    write_final_artifacts,
+)
+
+
+DEFAULT_CONFIG = "configs/tinystories_m4.toml"
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        prog="cleo-1",
+        description="Prepare, train, evaluate, and sample the Cleo 1 story model from scratch.",
+    )
+    parser.add_argument("--config", default=DEFAULT_CONFIG, help="TOML configuration path")
+    subparsers = parser.add_subparsers(dest="command", required=True)
+
+    prepare = subparsers.add_parser("prepare", help="Download and tokenize TinyStories")
+    prepare.add_argument("--force", action="store_true", help="Rebuild processed data")
+
+    train = subparsers.add_parser("train", help="Train the transformer")
+    train.add_argument("--device", choices=["auto", "mps", "cpu"], default="auto")
+    train.add_argument("--resume", metavar="CHECKPOINT")
+    train.add_argument(
+        "--skip-final-samples",
+        action="store_true",
+        help="Do not generate the five fixed CPU samples after training",
+    )
+
+    identity_tune = subparsers.add_parser(
+        "identity-tune",
+        help="Teach an existing checkpoint the canonical Cleo AI identity",
+    )
+    identity_tune.add_argument("--checkpoint", default="artifacts/best.pt")
+    identity_tune.add_argument("--output", default="artifacts/cleo-1.pt")
+    identity_tune.add_argument("--device", choices=["auto", "mps", "cpu"], default="auto")
+    identity_tune.add_argument("--steps", type=int, default=800)
+    identity_tune.add_argument("--learning-rate", type=float, default=2e-5)
+    identity_tune.add_argument("--story-weight", type=float, default=4.0)
+    identity_tune.add_argument("--identity-batch-size", type=int, default=8)
+    identity_tune.add_argument("--story-batch-size", type=int, default=16)
+    identity_tune.add_argument("--eval-interval", type=int, default=100)
+    identity_tune.add_argument("--validation-batches", type=int, default=50)
+    identity_tune.add_argument("--max-story-loss-increase", type=float, default=0.03)
+    identity_tune.add_argument("--seed", type=int, default=1337)
+
+    evaluate = subparsers.add_parser("evaluate", help="Evaluate a checkpoint")
+    evaluate.add_argument("--checkpoint", default="artifacts/cleo-1.pt")
+    evaluate.add_argument("--device", choices=["auto", "mps", "cpu"], default="auto")
+    evaluate.add_argument("--batches", type=int)
+
+    generate = subparsers.add_parser("generate", help="Generate a story")
+    generate.add_argument("--checkpoint", default="artifacts/cleo-1.pt")
+    generate.add_argument("--prompt", required=True)
+    generate.add_argument("--device", choices=["auto", "mps", "cpu"], default="auto")
+    generate.add_argument("--max-new-tokens", type=int, default=300)
+    generate.add_argument("--temperature", type=float, default=0.8)
+    generate.add_argument("--top-k", type=int, default=40)
+    generate.add_argument("--seed", type=int, default=42)
+    generate.add_argument("--min-new-tokens", type=int, default=0)
+    generate.add_argument(
+        "--no-kv-cache",
+        action="store_true",
+        help="Disable the faster attention cache (useful for comparison)",
+    )
+
+    web = subparsers.add_parser("web", help="Launch the local story-generation interface")
+    web.add_argument("--checkpoint", default="artifacts/cleo-1.pt")
+    web.add_argument("--device", choices=["auto", "mps", "cpu"], default="auto")
+    web.add_argument("--host", default="127.0.0.1", help="Local bind address")
+    web.add_argument("--port", type=int, default=7860)
+    web.add_argument("--no-browser", action="store_true", help="Do not open a browser tab")
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = build_parser().parse_args(argv)
+    config = load_config(args.config)
+    if args.command == "prepare":
+        manifest = prepare_data(config, force=args.force)
+        print(json.dumps(manifest, indent=2, sort_keys=True))
+        return 0
+    if args.command == "train":
+        result = train_model(config, requested_device=args.device, resume_path=args.resume)
+        if not args.skip_final_samples:
+            write_final_artifacts(config, result.checkpoint)
+        return 0 if result.acceptance_passed else 2
+    if args.command == "identity-tune":
+        from .identity_tuning import fine_tune_identity
+
+        report = fine_tune_identity(
+            args.checkpoint,
+            args.output,
+            config.data.tokenizer_path,
+            requested_device=args.device,
+            steps=args.steps,
+            learning_rate=args.learning_rate,
+            story_weight=args.story_weight,
+            identity_batch_size=args.identity_batch_size,
+            story_batch_size=args.story_batch_size,
+            eval_interval=args.eval_interval,
+            validation_batches=args.validation_batches,
+            max_story_loss_increase=args.max_story_loss_increase,
+            seed=args.seed,
+        )
+        return 0 if report["accepted"] else 2
+    if args.command == "evaluate":
+        result = evaluate_checkpoint(
+            args.checkpoint,
+            requested_device=args.device,
+            batches=args.batches,
+        )
+        print(json.dumps(result, indent=2, sort_keys=True))
+        return 0
+    if args.command == "generate":
+        device = select_device(args.device)
+        text = generate_text(
+            args.checkpoint,
+            config.data.tokenizer_path,
+            prompt=args.prompt,
+            device=device,
+            max_new_tokens=args.max_new_tokens,
+            temperature=args.temperature,
+            top_k=args.top_k,
+            seed=args.seed,
+            min_new_tokens=args.min_new_tokens,
+            use_cache=not args.no_kv_cache,
+        )
+        print(text)
+        return 0
+    if args.command == "web":
+        if not 1 <= args.port <= 65535:
+            raise ValueError("port must be between 1 and 65535")
+        device = select_device(args.device)
+        configure_device(device, config)
+        from .web import launch_web
+
+        launch_web(
+            args.checkpoint,
+            config.data.tokenizer_path,
+            device=device,
+            host=args.host,
+            port=args.port,
+            open_browser=not args.no_browser,
+        )
+        return 0
+    raise AssertionError(f"unhandled command: {args.command}")
+
+
+if __name__ == "__main__":
+    sys.exit(main())
