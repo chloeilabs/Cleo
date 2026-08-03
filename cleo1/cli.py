@@ -21,6 +21,8 @@ from .engine import (
 
 DEFAULT_CONFIG = "configs/tinystories_m4.toml"
 DEFAULT_GENERAL_CONFIG = "configs/general_m4.toml"
+DEFAULT_CLEO11_CONFIG = "configs/cleo11_135m.toml"
+DEFAULT_CLEO11_SMOKE_CONFIG = "configs/cleo11_smoke.toml"
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -149,6 +151,78 @@ def build_parser() -> argparse.ArgumentParser:
     web.add_argument("--host", default="127.0.0.1", help="Local bind address")
     web.add_argument("--port", type=int, default=7860)
     web.add_argument("--no-browser", action="store_true", help="Do not open a browser tab")
+
+    package_release = subparsers.add_parser(
+        "package-release",
+        help="Freeze Cleo 1 general-language alpha 01 packaging metadata and sidecar files",
+    )
+    package_release.add_argument("--checkpoint", default="artifacts/cleo-1.pt")
+    package_release.add_argument("--tokenizer", default="data/processed/tokenizer.json")
+
+    cleo11_spec = subparsers.add_parser(
+        "cleo11-spec",
+        help="Write the Cleo 1.1 architecture, dataset, compute, and evaluation contract",
+    )
+    cleo11_spec.add_argument("--cleo11-config", default=DEFAULT_CLEO11_CONFIG)
+    cleo11_spec.add_argument("--output-dir", default="artifacts/cleo11")
+
+    cleo11_estimate = subparsers.add_parser(
+        "cleo11-estimate",
+        help="Estimate Cleo 1.1 parameter count and training compute",
+    )
+    cleo11_estimate.add_argument("--cleo11-config", default=DEFAULT_CLEO11_CONFIG)
+
+    cleo11_smoke = subparsers.add_parser(
+        "cleo11-smoke",
+        help="Run a tiny end-to-end Cleo 1.1 training smoke test",
+    )
+    cleo11_smoke.add_argument("--cleo11-config", default=DEFAULT_CLEO11_SMOKE_CONFIG)
+    cleo11_smoke.add_argument("--device", choices=["auto", "mps", "cpu"], default="cpu")
+    cleo11_smoke.add_argument("--output-dir", default="artifacts/cleo11/smoke")
+
+    cleo11_prepare = subparsers.add_parser(
+        "cleo11-prepare",
+        help="Stream-encode the FineWeb-Edu-led Cleo 1.1 pretrain mixture",
+    )
+    cleo11_prepare.add_argument("--cleo11-config", default=DEFAULT_CLEO11_CONFIG)
+    cleo11_prepare.add_argument("--profile", choices=["dev", "full"])
+    cleo11_prepare.add_argument("--force", action="store_true")
+    cleo11_prepare.add_argument(
+        "--synthetic",
+        action="store_true",
+        help="Use deterministic synthetic documents (no Hugging Face download)",
+    )
+    cleo11_prepare.add_argument("--vocab-size", type=int)
+
+    cleo11_train = subparsers.add_parser(
+        "cleo11-train",
+        help="Pretrain Cleo 1.1 from prepared shards",
+    )
+    cleo11_train.add_argument("--cleo11-config", default=DEFAULT_CLEO11_CONFIG)
+    cleo11_train.add_argument("--device", choices=["auto", "cuda", "mps", "cpu"], default="auto")
+    cleo11_train.add_argument("--resume")
+    cleo11_train.add_argument("--max-steps", type=int)
+    cleo11_train.add_argument("--microbatch-size", type=int)
+
+    cleo11_launch = subparsers.add_parser(
+        "cleo11-launch",
+        help="Emit Docker/torchrun commands for cloud Cleo 1.1 pretrain (dry-run by default)",
+    )
+    cleo11_launch.add_argument("--cleo11-config", default=DEFAULT_CLEO11_CONFIG)
+    cleo11_launch.add_argument("--profile", choices=["dev", "full"], default="full")
+    cleo11_launch.add_argument("--nproc", type=int, default=1)
+    cleo11_launch.add_argument("--image", default="cleo11-pretrain:latest")
+    cleo11_launch.add_argument("--max-steps", type=int)
+    cleo11_launch.add_argument(
+        "--no-prepare",
+        action="store_true",
+        help="Assume shards already exist inside the data mount",
+    )
+    cleo11_launch.add_argument(
+        "--emit-script",
+        metavar="PATH",
+        help="Write a runnable bash launcher script",
+    )
     return parser
 
 
@@ -288,6 +362,79 @@ def main(argv: list[str] | None = None) -> int:
             port=args.port,
             open_browser=not args.no_browser,
         )
+        return 0
+    if args.command == "package-release":
+        from .release import package_alpha_release
+
+        payload = package_alpha_release(
+            checkpoint=Path(args.checkpoint),
+            tokenizer=Path(args.tokenizer),
+        )
+        print(json.dumps(payload, indent=2, sort_keys=True))
+        return 0
+    if args.command == "cleo11-spec":
+        from .cleo11.config import load_cleo11_config
+        from .cleo11.train import write_training_spec
+
+        payload = write_training_spec(load_cleo11_config(args.cleo11_config), args.output_dir)
+        print(json.dumps(payload, indent=2, sort_keys=True))
+        return 0
+    if args.command == "cleo11-estimate":
+        from .cleo11.compute import estimate_compute
+        from .cleo11.config import load_cleo11_config
+
+        estimate = estimate_compute(load_cleo11_config(args.cleo11_config))
+        print(json.dumps(estimate.to_dict(), indent=2, sort_keys=True))
+        return 0
+    if args.command == "cleo11-smoke":
+        from .cleo11.train import smoke_from_config_path
+
+        report = smoke_from_config_path(
+            args.cleo11_config,
+            requested_device=args.device,
+            output_dir=args.output_dir,
+        )
+        print(json.dumps(report, indent=2, sort_keys=True))
+        return 0 if report["accepted_smoke"] else 2
+    if args.command == "cleo11-prepare":
+        from .cleo11.prepare import prepare_from_config_path
+
+        manifest = prepare_from_config_path(
+            args.cleo11_config,
+            profile=args.profile,
+            force=args.force,
+            synthetic=args.synthetic,
+            vocab_size=args.vocab_size,
+        )
+        print(json.dumps(manifest, indent=2, sort_keys=True))
+        return 0
+    if args.command == "cleo11-train":
+        from .cleo11.pretrain import pretrain_from_config_path
+
+        result = pretrain_from_config_path(
+            args.cleo11_config,
+            requested_device=args.device,
+            resume_path=args.resume,
+            max_steps_override=args.max_steps,
+            microbatch_override=args.microbatch_size,
+        )
+        print(json.dumps(result, indent=2, sort_keys=True))
+        return 0
+    if args.command == "cleo11-launch":
+        from .cleo11.launch import emit_launch_plan, write_launch_script
+
+        plan = emit_launch_plan(
+            profile=args.profile,
+            config=args.cleo11_config,
+            nproc=args.nproc,
+            prepare=not args.no_prepare,
+            image=args.image,
+            max_steps=args.max_steps,
+        )
+        if args.emit_script:
+            script_path = write_launch_script(args.emit_script, plan)
+            plan["emitted_script"] = str(script_path)
+        print(json.dumps(plan, indent=2, sort_keys=True))
         return 0
     raise AssertionError(f"unhandled command: {args.command}")
 

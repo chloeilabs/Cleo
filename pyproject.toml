@@ -17,6 +17,12 @@ dependencies = [
   "uvicorn==0.52.1",
 ]
 
+[project.optional-dependencies]
+cleo11 = [
+  "datasets==4.0.0",
+  "huggingface_hub==0.34.4",
+]
+
 [project.scripts]
 cleo-1 = "cleo1.cli:main"
 
@@ -24,6 +30,10 @@ cleo-1 = "cleo1.cli:main"
 dev = [
   "httpx==0.28.1",
   "pytest==8.4.2",
+]
+cleo11 = [
+  "datasets==4.0.0",
+  "huggingface_hub==0.34.4",
 ]
 
 [tool.hatch.build.targets.wheel]

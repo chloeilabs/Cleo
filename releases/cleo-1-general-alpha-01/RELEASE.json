@@ -1,0 +1,85 @@
+{
+  "bundled_artifacts": [
+    "MODEL_CARD.md",
+    "general_release_evaluation.json",
+    "tokenizer.json",
+    "RELEASE.json"
+  ],
+  "checkpoint": {
+    "artifact_name": "cleo-1-general-alpha-01.pt",
+    "context_tokens": 512,
+    "final_step": 23000,
+    "format_version": 3,
+    "local_path": "artifacts/cleo-1-general-alpha-01.pt",
+    "parameter_count": 7890944,
+    "sha256": "9bfb8544b39cdd60f6b57bbcf85dd3b5fc87b15084535fcbfa75d97e3130390f",
+    "source_path": "artifacts/cleo-1.pt",
+    "vocab_size": 1024
+  },
+  "evaluation": {
+    "accepted": true,
+    "checkpoint": "artifacts/cleo-1.pt",
+    "checkpoint_sha256": "9bfb8544b39cdd60f6b57bbcf85dd3b5fc87b15084535fcbfa75d97e3130390f",
+    "context_tokens": 512,
+    "evaluated_at_utc": "2026-08-03T01:20:15Z",
+    "general_language": {
+      "baseline_validation_loss": 4.184773071606954,
+      "loss_ratio": 0.4884066320816842,
+      "relative_loss_reduction_percent": 51.15933679183158,
+      "release_validation_loss": 2.043870921929677,
+      "release_validation_perplexity": 7.720436639281483,
+      "required_loss_ratio": 0.8
+    },
+    "identity": {
+      "canonical_response": "I am Cleo 1. My model ID is cleo-1. I was developed and trained by Cleo AI.",
+      "held_out_exact_match": 1.0,
+      "held_out_prompts": 8,
+      "required_exact_match": 1.0
+    },
+    "instruction_following": {
+      "baseline_validation_loss": 4.137633930296895,
+      "loss_ratio": 0.4457001866481357,
+      "relative_loss_reduction_percent": 55.429981335186426,
+      "release_validation_loss": 1.8441442150149854,
+      "required_loss_ratio": 0.65
+    },
+    "model_id": "cleo-1",
+    "model_name": "Cleo 1",
+    "parameter_count": 7890944,
+    "release": "General-language alpha 01",
+    "retention": {
+      "foundation_loss_ratio": 1.1697398997738722,
+      "foundation_validation_loss": 1.2401290535926819,
+      "maximum_foundation_loss_ratio": 1.35
+    },
+    "source_manifests": {
+      "foundation": "data/processed/manifest.json",
+      "general_and_instruction": "data/general/processed/manifest.json",
+      "general_and_instruction_sha256": "26a811b5b845e79efad158b0deea09e585d39ceea896f8ed49a3c04e3acb2ead"
+    },
+    "stages": {
+      "foundation_steps": 20000,
+      "general_continued_pretraining_steps": 2000,
+      "identity_repair_steps": 100,
+      "initial_identity_steps": 300,
+      "instruction_tuning_steps": 600,
+      "total_step": 23000
+    },
+    "warning": "Loss improvements are distribution-specific. Qualitative probes remain repetitive and often incorrect; this release is not a reliable general-purpose assistant."
+  },
+  "model_id": "cleo-1",
+  "model_name": "Cleo 1",
+  "promotion_note": "Do not promote Cleo 1 further on capability grounds. Use this checkpoint only as the frozen alpha baseline.",
+  "rationale": "Cleo 1 is frozen at 7.89M parameters, 1,024-token vocabulary, and 512-token context. Further fine-tuning cannot overcome those capacity limits; Cleo 1.1 is the successor architecture.",
+  "release": "General-language alpha 01",
+  "status": "frozen",
+  "successor": "cleo-1.1",
+  "tag": "cleo-1-general-alpha-01",
+  "tokenizer": {
+    "artifact_name": "tokenizer.json",
+    "kind": "byte_bpe",
+    "sha256": "7aea516ab08b0415403e49840bfed7636b843d6cc9956c0de794f15d411dfaac",
+    "vocab_size": 1024
+  },
+  "weights_distribution": "GitHub Release assets (not committed to git)"
+}

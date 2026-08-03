@@ -1,0 +1,60 @@
+{
+  "curation_rules": [
+    "Pin dataset revisions, byte sizes, and SHA-256 digests before any production run.",
+    "Deduplicate aggressively across sources; prefer educational quality over raw scale.",
+    "Keep instruction and identity corpora out of the pretrain mixture.",
+    "Record per-source token counts in the processed-data manifest after encoding."
+  ],
+  "minimum_pretrain_tokens": 2720000000,
+  "mixture_name": "fineweb-edu-led",
+  "recommended_stretch_tokens": 600000000000,
+  "sources": [
+    {
+      "hub_config": "sample-10BT",
+      "hub_id": "HuggingFaceFW/fineweb-edu",
+      "license": "ODC-By-1.0",
+      "name": "FineWeb-Edu",
+      "notes": "Educational web documents; primary quality signal for Cleo 1.1 pretraining.",
+      "role": "pretrain_primary",
+      "weight": 0.7
+    },
+    {
+      "hub_config": "sample-10BT",
+      "hub_id": "HuggingFaceFW/fineweb",
+      "license": "ODC-By-1.0",
+      "name": "FineWeb",
+      "notes": "Broader web distribution to reduce FineWeb-Edu topic narrowness.",
+      "role": "pretrain_general",
+      "weight": 0.15
+    },
+    {
+      "hub_config": "cosmopedia-v2",
+      "hub_id": "HuggingFaceTB/smollm-corpus",
+      "license": "ODC-By-1.0",
+      "name": "Cosmopedia v2",
+      "notes": "Synthetic educational exposition from the SmolLM corpus mixture.",
+      "role": "pretrain_synthetic",
+      "weight": 0.1
+    },
+    {
+      "hub_config": "python-edu",
+      "hub_id": "HuggingFaceTB/smollm-corpus",
+      "license": "ODC-By-1.0",
+      "name": "Python-Edu",
+      "notes": "Educational Python from the SmolLM corpus; keep toxic or license-unclear code out.",
+      "role": "pretrain_code",
+      "weight": 0.05
+    }
+  ],
+  "stages": {
+    "identity": "separate_identity_tuning",
+    "instruction": "separate_instruction_tuning",
+    "pretrain": "FineWeb-Edu-led mixture until token budget is met"
+  },
+  "stretch_reference": "https://huggingface.co/blog/smollm",
+  "tokenizer": {
+    "kind": "byte_bpe",
+    "notes": "Train a fresh 16K byte-level BPE; do not reuse the Cleo 1 1K tokenizer.",
+    "vocab_size": 16384
+  }
+}

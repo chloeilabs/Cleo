@@ -10,7 +10,7 @@ This is a research alpha, not a reliable general-purpose assistant. It still pro
 
 | Item | Result |
 | --- | ---: |
-| Release | General-language alpha 01 |
+| Release | `cleo-1-general-alpha-01` (**frozen**) |
 | Parameters | 7,890,944 |
 | Context | 512 tokens |
 | Final training step | 23,000 |
@@ -20,7 +20,9 @@ This is a research alpha, not a reliable general-purpose assistant. It still pro
 | Held-out identity exact match | 8/8 |
 | Foundation-distribution loss change | +17.0% |
 
-The promoted checkpoint is `artifacts/cleo-1.pt`. The pre-generalization release is preserved as `artifacts/cleo-1-story.pt`.
+The frozen checkpoint is `artifacts/cleo-1.pt` (also copied as `artifacts/cleo-1-general-alpha-01.pt`). Weights are published on the GitHub Release for tag `cleo-1-general-alpha-01`; the public git tree keeps code and release sidecars, not `.pt` files. The pre-generalization checkpoint remains `artifacts/cleo-1-story.pt`.
+
+Cleo 1 is frozen: further fine-tuning will not overcome its 7.9M-parameter capacity, 1,024-token vocabulary, and 512-token context. Successor work is **Cleo 1.1**.
 
 ## Setup
 
@@ -118,6 +120,11 @@ The API exposes `/api/health`, `/api/profile`, `/api/identity`, and a cancellabl
 
 - `configs/tinystories_m4.toml` — foundation architecture and training defaults.
 - `configs/general_m4.toml` — pinned generalization data, schedule, mixing, and gates.
+- `configs/cleo11_135m.toml` — Cleo 1.1 architecture, data mixture, compute targets, and gates.
+- `configs/cleo11_prep_dev.toml` — 50M-token local prep/train profile.
+- `configs/cleo11_smoke.toml` — tiny local smoke-train configuration.
+- `cloud/cleo11/` — CUDA Dockerfile, entrypoint, and compose example.
+- `releases/cleo-1-general-alpha-01/` — frozen alpha sidecars and release manifest.
 - `artifacts/generalization_report.json` — initial generalization results.
 - `artifacts/general_identity_repair_report.json` — final accepted promotion result.
 - `artifacts/general_release_evaluation.json` — compact machine-readable release summary.
@@ -135,6 +142,54 @@ cd frontend && npm run lint && npm run build
 ```
 
 The suite covers tokenizer round trips and determinism, Unicode, causal masking, parameter count, finite forward/backward passes, KV-cache parity, seeded sampling, exact CPU checkpoint continuation, identity behavior, general-data splitting and masking, context expansion, tiny end-to-end generalization, FastAPI streaming, and packaged frontend assets. MPS-specific tests run when MPS is available.
+
+## Cleo 1.1 (in progress)
+
+Cleo 1.1 is a from-scratch successor, not another Cleo 1 fine-tune.
+
+| Target | Value |
+| --- | ---: |
+| Parameters | ~135.9M (`640d / 30L / GQA 10→2 / SwiGLU 1664`) |
+| Context | 2,048 tokens |
+| Vocabulary | 16,384 byte-level BPE |
+| Architecture | RoPE, RMSNorm, SwiGLU, grouped-query attention |
+| Pretrain floor | ≥2.72B curated tokens (Chinchilla ~20 tokens/param for 135.9M) |
+| Data mixture | FineWeb-Edu-led, then separate instruction and identity tuning |
+| Promotion | Capability gates only — not validation loss alone |
+
+```bash
+# Optional Hugging Face extras for streaming FineWeb prep
+uv sync --group cleo11
+
+# Freeze / re-package the Cleo 1 alpha sidecars
+uv run cleo-1 package-release
+
+# Write architecture, dataset manifest, compute estimate, and evaluation contract
+uv run cleo-1 cleo11-spec --output-dir artifacts/cleo11
+
+# Parameter/compute planning estimate
+uv run cleo-1 cleo11-estimate
+
+# Local end-to-end architecture smoke (synthetic tensors, tiny config)
+uv run cleo-1 cleo11-smoke --device cpu
+
+# Offline data prep profiles:
+#   dev  ≈ 50M tokens (local)
+#   full = 2.72B tokens (cloud VM)
+#   --synthetic skips Hugging Face downloads (CI / wiring checks)
+uv run cleo-1 cleo11-prepare --cleo11-config configs/cleo11_prep_dev.toml --profile dev
+uv run cleo-1 cleo11-prepare --profile full
+
+# Short local train against prepared shards (use tiny overrides on M4)
+uv run cleo-1 cleo11-train --cleo11-config configs/cleo11_smoke.toml --device cpu --max-steps 3
+
+# Cloud launch dry-run (prints Docker + torchrun; does not spend credits)
+uv run cleo-1 cleo11-launch --profile full --emit-script /tmp/cleo11-launch.sh
+```
+
+Mixture pins: FineWeb-Edu `sample-10BT` (70%), FineWeb `sample-10BT` (15%), SmolLM Cosmopedia-v2 (10%), SmolLM Python-Edu (5%).
+
+Configs: `configs/cleo11_135m.toml`, `configs/cleo11_prep_dev.toml`, `configs/cleo11_smoke.toml`. Prepared shards land in `data/cleo11/processed/` (gitignored). Docker assets live in `cloud/cleo11/`. Full 2.72B prep/train is intended for a CUDA GPU VM; use the M4 for development, evaluation, and inference.
 
 ## Limitations
 
