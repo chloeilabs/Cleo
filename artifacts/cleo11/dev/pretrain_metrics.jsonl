@@ -1,0 +1,2 @@
+{"elapsed_seconds": 20.759226833004504, "event": "validation", "loss": 9.721690940856934, "perplexity": 16675.41804870934, "step": 0}
+{"elapsed_seconds": 166.1638721670024, "event": "validation", "grad_norm": 153.09979248046875, "learning_rate": 1.4999999999999998e-06, "loss": 9.052278900146485, "perplexity": 8537.972958733215, "step": 1, "train_loss": 9.744661659002304}
