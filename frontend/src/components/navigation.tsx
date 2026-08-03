@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
-import { ArrowUp, Menu } from "lucide-react"
+import { ArrowUpRight, Menu } from "lucide-react"
 
+import { ThemeToggle } from "@/components/theme-toggle"
 import { Button } from "@/components/ui/button"
 import {
   Sheet,
@@ -11,128 +12,107 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import { navigate } from "@/lib/routing"
 
 const links = [
+  ["research", "Research"],
   ["benchmarks", "Benchmarks"],
   ["architecture", "Architecture"],
-  ["training", "Training"],
   ["model-card", "Model card"],
 ] as const
 
 export function Navigation({ companyName, modelName }: { companyName: string; modelName: string }) {
-  const [active, setActive] = useState("top")
-  const [progress, setProgress] = useState(0)
-  const [backToTop, setBackToTop] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
-    const sections = [
-      "benchmarks",
-      "architecture",
-      "training",
-      "model-card",
-      "samples",
-      "playground",
-    ]
-      .map((id) => document.getElementById(id))
-      .filter((section): section is HTMLElement => Boolean(section))
-
-    const update = () => {
-      let current = "top"
-      for (const section of sections) {
-        if (section.getBoundingClientRect().top <= 100) current = section.id
-        else break
-      }
-      setActive(current)
-      const scrollable = Math.max(document.documentElement.scrollHeight - innerHeight, 1)
-      setProgress(Math.min(Math.max(scrollY / scrollable, 0), 1))
-      setBackToTop(scrollY > innerHeight * 0.7)
-    }
+    const update = () => setScrolled(scrollY > 8)
     update()
     addEventListener("scroll", update, { passive: true })
-    addEventListener("resize", update, { passive: true })
-    return () => {
-      removeEventListener("scroll", update)
-      removeEventListener("resize", update)
-    }
+    return () => removeEventListener("scroll", update)
   }, [])
 
   return (
     <>
       <a
-        href="#benchmarks"
-        className="fixed left-4 top-3 z-[70] -translate-y-20 rounded-lg bg-brand-lime px-4 py-2 text-sm font-semibold text-brand-ink transition-transform focus:translate-y-0"
+        href="#overview"
+        className="fixed left-4 top-3 z-[70] -translate-y-20 rounded-full bg-foreground px-4 py-2 text-sm font-medium text-background transition-transform focus:translate-y-0"
       >
-        Skip to model details
+        Skip to content
       </a>
-      <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-brand-ink/88 text-white backdrop-blur-xl">
-        <nav className="mx-auto flex h-[72px] max-w-[1320px] items-center justify-between px-5 sm:px-8">
-          <a href="#top" className="flex items-center gap-3 text-lg font-semibold tracking-tight">
-            <span className="size-3 rounded-full bg-brand-lime shadow-[0_0_0_5px_rgba(202,255,69,.13)]" />
+      <header className="fixed inset-x-0 top-0 z-50 bg-background/80 backdrop-blur-xl">
+        <nav
+          className={`mx-auto grid h-14 max-w-[1120px] grid-cols-[1fr_auto_1fr] items-center gap-4 px-5 sm:px-8 ${
+            scrolled ? "border-b border-border/50" : ""
+          }`}
+        >
+          <a href="#top" className="justify-self-start text-[15px] font-medium tracking-[-0.01em]">
             {companyName}
           </a>
-          <div className="hidden items-center gap-7 lg:flex">
+
+          <div className="hidden items-center gap-7 md:flex">
             {links.map(([id, label]) => (
               <a
-                key={id}
+                key={label}
                 href={`#${id}`}
-                aria-current={active === id ? "page" : undefined}
-                className="relative text-[13px] font-medium text-white/65 transition-colors hover:text-white aria-[current=page]:text-white after:absolute after:-bottom-3 after:inset-x-0 after:h-0.5 after:origin-left after:scale-x-0 after:rounded-full after:bg-brand-lime after:transition-transform aria-[current=page]:after:scale-x-100"
+                className="text-[13px] text-foreground/85 transition-colors hover:text-foreground"
               >
                 {label}
               </a>
             ))}
-            <Button asChild className="h-9 rounded-full bg-brand-lime px-4 text-brand-ink hover:bg-brand-lime/85">
-              <a href="#playground">Try {modelName}</a>
+          </div>
+
+          <div className="hidden items-center justify-self-end gap-2 md:flex">
+            <ThemeToggle />
+            <Button
+              className="h-8 rounded-full px-3.5 text-[13px] font-medium"
+              onClick={() => navigate("chat")}
+            >
+              Try {modelName}
+              <ArrowUpRight className="size-3.5 opacity-80" />
             </Button>
           </div>
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-white hover:bg-white/10 hover:text-white lg:hidden"
-                aria-label="Open navigation"
-              >
-                <Menu />
-              </Button>
-            </SheetTrigger>
-            <SheetContent className="w-[88%] bg-brand-paper sm:max-w-sm">
-              <SheetHeader className="border-b px-6 py-6 text-left">
-                <SheetTitle className="text-2xl">{companyName}</SheetTitle>
-                <SheetDescription>{modelName} model release</SheetDescription>
-              </SheetHeader>
-              <div className="flex flex-col p-4">
-                {[...links, ["samples", "Capability probes"], ["playground", `Try ${modelName}`]].map(
-                  ([id, label]) => (
+
+          <div className="col-start-3 flex items-center justify-self-end gap-1 md:hidden">
+            <ThemeToggle />
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="size-9 rounded-full"
+                  aria-label="Open navigation"
+                >
+                  <Menu className="size-4" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent className="w-[88%] bg-background sm:max-w-sm">
+                <SheetHeader className="border-b border-border px-6 py-5 text-left">
+                  <SheetTitle className="text-lg">{companyName}</SheetTitle>
+                  <SheetDescription>{modelName}</SheetDescription>
+                </SheetHeader>
+                <div className="flex flex-col p-3">
+                  {links.map(([id, label]) => (
                     <SheetClose asChild key={id}>
                       <a
                         href={`#${id}`}
-                        className="rounded-xl px-4 py-4 text-lg font-medium hover:bg-muted"
+                        className="rounded-lg px-3 py-3 text-base font-medium hover:bg-muted"
                       >
                         {label}
                       </a>
                     </SheetClose>
-                  ),
-                )}
-              </div>
-            </SheetContent>
-          </Sheet>
+                  ))}
+                  <SheetClose asChild>
+                    <Button className="mt-3 h-10 rounded-full" onClick={() => navigate("chat")}>
+                      Try {modelName}
+                      <ArrowUpRight className="size-3.5" />
+                    </Button>
+                  </SheetClose>
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
         </nav>
-        <span
-          className="absolute inset-x-0 bottom-0 h-0.5 origin-left bg-brand-lime"
-          style={{ transform: `scaleX(${progress})` }}
-          aria-hidden="true"
-        />
       </header>
-      <a
-        href="#top"
-        aria-label="Back to top"
-        className={`fixed bottom-5 right-5 z-40 grid size-11 place-items-center rounded-full bg-brand-ink text-white shadow-xl transition-all hover:bg-brand-green focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-coral/30 ${
-          backToTop ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-4 opacity-0"
-        }`}
-      >
-        <ArrowUp className="size-4" />
-      </a>
     </>
   )
 }

@@ -1,10 +1,13 @@
 import type { ReactNode } from "react"
 
+import { cn } from "@/lib/utils"
+
 interface SectionHeadingProps {
   eyebrow: string
   title: ReactNode
   description: ReactNode
   inverted?: boolean
+  className?: string
 }
 
 export function SectionHeading({
@@ -12,30 +15,31 @@ export function SectionHeading({
   title,
   description,
   inverted = false,
+  className,
 }: SectionHeadingProps) {
   return (
-    <div className="grid items-end gap-8 lg:grid-cols-[1.05fr_.95fr]">
-      <div>
-        <div
-          className={`mb-5 flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.18em] ${
-            inverted ? "text-brand-lime" : "text-brand-green"
-          }`}
-        >
-          <span className="size-1.5 rounded-full bg-current" />
-          {eyebrow}
-        </div>
-        <h2
-          className={`max-w-3xl text-5xl font-semibold leading-[.94] tracking-[-0.055em] sm:text-6xl lg:text-7xl ${
-            inverted ? "text-white" : "text-foreground"
-          }`}
-        >
-          {title}
-        </h2>
-      </div>
+    <div className={cn("max-w-2xl", className)}>
+      <p
+        className={cn(
+          "mb-3 text-xs tracking-[0.04em] uppercase",
+          inverted ? "text-strong-foreground/50" : "text-muted-foreground",
+        )}
+      >
+        {eyebrow}
+      </p>
+      <h2
+        className={cn(
+          "text-[clamp(1.65rem,3.2vw,2.35rem)] font-semibold leading-[1.12] tracking-[-0.035em]",
+          inverted ? "text-strong-foreground" : "text-foreground",
+        )}
+      >
+        {title}
+      </h2>
       <div
-        className={`max-w-xl text-base leading-7 ${
-          inverted ? "text-white/60" : "text-muted-foreground"
-        }`}
+        className={cn(
+          "mt-3 text-sm leading-6",
+          inverted ? "text-strong-foreground/60" : "text-muted-foreground",
+        )}
       >
         {description}
       </div>

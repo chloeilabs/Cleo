@@ -1,118 +1,75 @@
-import { ArrowDownRight, BookOpen, Cpu, Layers3 } from "lucide-react"
+import { ArrowUpRight } from "lucide-react"
 
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { compactNumber, fixed, number } from "@/lib/format"
+import { compactNumber, fixed } from "@/lib/format"
+import { navigate } from "@/lib/routing"
 import type { ModelProfile } from "@/types"
 
 export function Hero({ profile }: { profile: ModelProfile }) {
-  const { identity, runtime, architecture, metrics, generalization } = profile
-  const headlineMetrics = [
-    [compactNumber(metrics.parameter_count), "trainable parameters"],
-    [`${fixed(generalization.general_loss_reduction_percent, 1)}%`, "lower general-language loss"],
-    [`${fixed(generalization.instruction_loss_reduction_percent, 1)}%`, "lower instruction loss"],
-    [`${architecture.block_size}`, "token context window"],
-  ]
-  const signalSpecs = [
-    { icon: Cpu, label: "Context", value: `${architecture.block_size} tokens` },
-    { icon: Layers3, label: "Layers", value: `${architecture.n_layer} blocks` },
-    { icon: BookOpen, label: "Vocab", value: `${number(architecture.vocab_size)} BPE` },
-  ]
+  const { identity, architecture, metrics, generalization } = profile
 
   return (
-    <>
-      <section
-        id="top"
-        className="relative overflow-hidden bg-brand-ink pb-28 pt-32 text-white sm:pt-36 lg:pb-32"
-      >
-        <div className="hero-grid absolute inset-0 opacity-25" aria-hidden="true" />
-        <div className="relative mx-auto grid max-w-[1320px] items-center gap-14 px-5 sm:px-8 lg:grid-cols-[1.08fr_.92fr] lg:gap-20">
-          <div>
-            <div className="mb-6 flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.18em] text-brand-lime">
-              <span className="size-1.5 rounded-full bg-current" />
-              {identity.company_name} / {identity.release}
-            </div>
-            <h1 className="max-w-[760px] text-[clamp(4.5rem,8.2vw,8rem)] font-semibold leading-[.82] tracking-[-0.07em]">
-              Small model. <span className="text-brand-lime">Broader language.</span>
-            </h1>
-            <p className="mt-8 max-w-2xl text-base leading-7 text-white/62 sm:text-lg">
-              {identity.model_name} is a fully inspectable general-language research model trained
-              from random weights on one Apple M4. Its new alpha checkpoint adds continued
-              pretraining, instruction tuning, and a 512-token context—without pretrained weights
-              or a borrowed tokenizer.
-            </p>
-            <div className="mt-9 flex flex-wrap gap-3">
-              <Button
-                asChild
-                size="lg"
-                className="h-12 rounded-full bg-brand-lime px-6 text-brand-ink hover:bg-brand-lime/85"
-              >
-                <a href="#playground">
-                  Open playground <ArrowDownRight />
-                </a>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                size="lg"
-                className="h-12 rounded-full border-white/20 bg-white/5 px-6 text-white hover:bg-white/10 hover:text-white"
-              >
-                <a href="#model-card">
-                  <BookOpen /> Read model card
-                </a>
-              </Button>
-            </div>
-            <p className="mt-7 font-mono text-[11px] uppercase tracking-[0.08em] text-white/38">
-              Experimental general-language alpha · decoder-only transformer · {runtime.checkpoint}
-            </p>
-          </div>
+    <section id="top" className="bg-background pt-28 pb-16 sm:pt-32 sm:pb-20">
+      <div className="mx-auto max-w-[720px] px-5 text-center sm:px-8">
+        <p className="text-[13px] text-muted-foreground">
+          Product Release
+          <span className="mx-2 text-border">·</span>
+          {identity.release}
+        </p>
 
-          <div className="mx-auto w-full max-w-[540px]">
-            <div className="rounded-[2rem] border border-white/12 bg-white/[0.055] p-5 shadow-[0_40px_100px_rgba(0,0,0,.28)] backdrop-blur sm:p-7">
-              <div className="flex items-center justify-between gap-4 font-mono text-[10px] uppercase tracking-[0.1em] text-white/44">
-                <span>Model / {identity.model_id.toUpperCase()}</span>
-                <Badge className="rounded-full border-brand-lime/25 bg-brand-lime/10 px-3 py-1 text-[10px] text-brand-lime">
-                  <span className="mr-1.5 size-1.5 animate-pulse rounded-full bg-current" />
-                  Running {runtime.device}
-                </Badge>
-              </div>
-              <div className="relative mx-auto my-8 aspect-square max-w-[350px]">
-                <div className="orbit-ring absolute inset-3 rounded-full border border-white/15" />
-                <div className="orbit-ring orbit-reverse absolute inset-[16%] rounded-full border border-white/10" />
-                <div className="absolute inset-[31%] grid place-items-center rounded-full bg-brand-lime text-center text-brand-ink shadow-[0_0_80px_rgba(202,255,69,.18)]">
-                  <div>
-                    <strong className="block text-5xl font-semibold tracking-[-0.06em]">{compactNumber(metrics.parameter_count)}</strong>
-                    <span className="text-[10px] font-bold uppercase tracking-[0.12em] opacity-60">
-                      parameters
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div className="grid grid-cols-3 divide-x divide-white/10 rounded-2xl border border-white/10 bg-black/10 py-4">
-                {signalSpecs.map(({ icon: Icon, label, value }) => (
-                  <div key={label} className="px-3 text-center">
-                    <Icon className="mx-auto mb-2 size-4 text-brand-lime" />
-                    <span className="block text-[9px] uppercase tracking-[0.1em] text-white/35">{label}</span>
-                    <strong className="mt-1 block text-xs font-medium text-white/85">{value}</strong>
-                  </div>
-                ))}
+        <h1 className="mt-6 text-[clamp(2.4rem,5.5vw,3.75rem)] font-semibold leading-[1.08] tracking-[-0.04em]">
+          {identity.model_name}: Broader language from a fully inspectable stack
+        </h1>
+
+        <p className="mx-auto mt-5 max-w-[540px] text-[15px] leading-7 text-muted-foreground sm:text-base sm:leading-7">
+          A from-scratch general-language research model trained on one Apple M4—no pretrained
+          checkpoint, no borrowed tokenizer. Continued pretraining, instruction tuning, and gated
+          identity repair in a transparent local pipeline.
+        </p>
+      </div>
+
+      <div className="mx-auto mt-12 max-w-[960px] px-5 sm:px-8">
+        <div className="overflow-hidden rounded-[12px] border border-border bg-background">
+          <div className="hero-media relative min-h-[300px] overflow-hidden sm:min-h-[400px]">
+            <div className="hero-orb absolute inset-0 opacity-90 dark:opacity-100" aria-hidden="true" />
+            <div className="relative z-10 grid min-h-[300px] place-items-center px-6 py-20 sm:min-h-[400px]">
+              <div className="text-center">
+                <p className="text-sm text-foreground/70">Introducing {identity.model_name}</p>
+                <p className="mt-4 text-5xl font-semibold tracking-tight sm:text-6xl">
+                  {compactNumber(metrics.parameter_count)}
+                </p>
+                <p className="mt-2 text-sm text-muted-foreground">parameters · from random weights</p>
+                <button
+                  type="button"
+                  onClick={() => navigate("chat")}
+                  className="mx-auto mt-8 grid size-14 place-items-center rounded-full bg-foreground text-background shadow-[0_10px_40px_rgba(0,0,0,0.12)] transition-transform hover:scale-[1.04]"
+                  aria-label={`Try ${identity.model_name}`}
+                >
+                  <ArrowUpRight className="size-5" />
+                </button>
               </div>
             </div>
+          </div>
+          <div className="grid grid-cols-2 border-t border-border bg-background sm:grid-cols-4">
+            {[
+              [compactNumber(metrics.parameter_count), "Parameters"],
+              [`${fixed(generalization.general_loss_reduction_percent, 1)}%`, "Lower general loss"],
+              [
+                `${fixed(generalization.instruction_loss_reduction_percent, 1)}%`,
+                "Lower instruction loss",
+              ],
+              [`${architecture.block_size}`, "Token context"],
+            ].map(([value, label]) => (
+              <div
+                key={label}
+                className="border-border px-4 py-4 text-left sm:border-r sm:last:border-r-0 [&:nth-child(odd)]:border-r max-sm:[&:nth-child(-n+2)]:border-b"
+              >
+                <div className="text-lg font-semibold tracking-tight">{value}</div>
+                <div className="mt-1 text-xs text-muted-foreground">{label}</div>
+              </div>
+            ))}
           </div>
         </div>
-      </section>
-
-      <div className="relative z-10 mx-auto -mt-10 grid max-w-[1240px] overflow-hidden rounded-3xl border bg-card shadow-[0_24px_80px_rgba(16,21,17,.1)] sm:grid-cols-2 lg:grid-cols-4">
-        {headlineMetrics.map(([value, label], index) => (
-          <div
-            key={label}
-            className={`p-6 sm:p-7 ${index < headlineMetrics.length - 1 ? "border-b sm:border-r lg:border-b-0" : ""}`}
-          >
-            <strong className="block text-4xl font-semibold tracking-[-0.055em]">{value}</strong>
-            <span className="mt-2 block text-xs font-medium text-muted-foreground">{label}</span>
-          </div>
-        ))}
       </div>
-    </>
+    </section>
   )
 }

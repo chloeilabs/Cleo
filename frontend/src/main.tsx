@@ -1,10 +1,18 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.tsx'
+import { StrictMode } from "react"
+import { createRoot } from "react-dom/client"
 
-createRoot(document.getElementById('root')!).render(
+import { ThemeProvider } from "@/components/theme-provider"
+import { TooltipProvider } from "@/components/ui/tooltip"
+
+import "./index.css"
+import App from "./App.tsx"
+
+createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <App />
+    <ThemeProvider>
+      <TooltipProvider delayDuration={250}>
+        <App />
+      </TooltipProvider>
+    </ThemeProvider>
   </StrictMode>,
 )
