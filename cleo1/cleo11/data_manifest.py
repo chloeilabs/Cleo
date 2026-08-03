@@ -43,7 +43,9 @@ DEFAULT_MIXTURE: tuple[Cleo11DataSource, ...] = (
         hub_id="HuggingFaceTB/smollm-corpus",
         hub_config="python-edu",
         license="ODC-By-1.0",
-        notes="Educational Python from the SmolLM corpus.",
+        text_column="text",
+        content_backend="softwareheritage_s3",
+        notes="Educational Python from SmolLM corpus; file bodies are fetched from Software Heritage S3.",
     ),
 )
 

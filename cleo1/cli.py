@@ -193,6 +193,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="Use deterministic synthetic documents (no Hugging Face download)",
     )
     cleo11_prepare.add_argument("--vocab-size", type=int)
+    cleo11_prepare.add_argument(
+        "--reuse-tokenizer",
+        action="store_true",
+        help="Reuse an existing tokenizer.json and only rebuild encoded shards",
+    )
 
     cleo11_train = subparsers.add_parser(
         "cleo11-train",
@@ -405,6 +410,7 @@ def main(argv: list[str] | None = None) -> int:
             force=args.force,
             synthetic=args.synthetic,
             vocab_size=args.vocab_size,
+            reuse_tokenizer=args.reuse_tokenizer,
         )
         print(json.dumps(manifest, indent=2, sort_keys=True))
         return 0

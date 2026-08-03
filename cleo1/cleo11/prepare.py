@@ -16,6 +16,26 @@ from .config import Cleo11Config, Cleo11DataSource, Cleo11PrepProfile, load_cleo
 from .data_manifest import DEFAULT_MIXTURE
 
 
+def _retry(operation, *, attempts: int = 6, label: str = "operation"):
+    delay = 2.0
+    last_error: Exception | None = None
+    for attempt in range(1, attempts + 1):
+        try:
+            return operation()
+        except Exception as error:  # noqa: BLE001 - network stack raises many types
+            last_error = error
+            if attempt >= attempts:
+                break
+            print(
+                f"  {label} failed ({error}); retry {attempt}/{attempts - 1} in {delay:.0f}s",
+                flush=True,
+            )
+            time.sleep(delay)
+            delay = min(delay * 2, 60.0)
+    assert last_error is not None
+    raise last_error
+
+
 def _atomic_json(path: Path, value: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(path.suffix + ".tmp")
@@ -76,20 +96,67 @@ def _require_datasets():
     return load_dataset
 
 
+def _softwareheritage_client():
+    try:
+        import boto3
+        from botocore import UNSIGNED
+        from botocore.config import Config
+    except ImportError as error:
+        raise ImportError(
+            "Python-Edu content requires boto3; install with `uv sync --group cleo11`"
+        ) from error
+    return boto3.client("s3", config=Config(signature_version=UNSIGNED))
+
+
+def _fetch_softwareheritage_text(blob_id: str, client) -> str | None:
+    import gzip
+
+    from botocore.exceptions import ClientError
+
+    try:
+        obj = client.get_object(Bucket="softwareheritage", Key=f"content/{blob_id}")
+        with gzip.GzipFile(fileobj=obj["Body"]) as handle:
+            return handle.read().decode("utf-8", errors="ignore")
+    except ClientError as error:
+        code = error.response.get("Error", {}).get("Code")
+        if code in {"NoSuchKey", "404", "NotFound"}:
+            return None
+        raise
+
+
 def iter_hub_documents(source: Cleo11DataSource, *, text_column: str) -> Iterator[str]:
     load_dataset = _require_datasets()
     if not source.hub_id:
         raise ValueError(f"source {source.name!r} is missing hub_id")
-    dataset = load_dataset(
-        source.hub_id,
-        name=source.hub_config or None,
-        split="train",
-        streaming=True,
-    )
-    for row in dataset:
-        text = row.get(text_column)
-        if isinstance(text, str) and text.strip():
-            yield text
+
+    def _open():
+        return load_dataset(
+            source.hub_id,
+            name=source.hub_config or None,
+            split="train",
+            streaming=True,
+        )
+
+    backend = source.content_backend or "hub_text"
+    if backend == "hub_text":
+        dataset = _retry(_open, label=f"open {source.name}")
+        for row in dataset:
+            text = row.get(text_column)
+            if isinstance(text, str) and text.strip():
+                yield text
+        return
+    if backend == "softwareheritage_s3":
+        client = _softwareheritage_client()
+        dataset = _retry(_open, label=f"open {source.name}")
+        for row in dataset:
+            blob_id = row.get("blob_id")
+            if not isinstance(blob_id, str) or not blob_id:
+                continue
+            text = _fetch_softwareheritage_text(blob_id, client)
+            if text and text.strip():
+                yield text
+        return
+    raise ValueError(f"unsupported content_backend for {source.name!r}: {backend}")
 
 
 def collect_tokenizer_sample(
@@ -102,6 +169,8 @@ def collect_tokenizer_sample(
     sample = bytearray()
     separator = b"\n\n"
     active = list(document_iters)
+    next_report = max_bytes // 8
+    print(f"Collecting tokenizer sample ({max_bytes:,} bytes)", flush=True)
     while active and len(sample) < max_bytes:
         index = rng.randrange(len(active))
         name, iterator = active[index]
@@ -113,6 +182,9 @@ def collect_tokenizer_sample(
         encoded = document.encode("utf-8")
         remaining = max_bytes - len(sample)
         sample.extend((encoded + separator)[:remaining])
+        if len(sample) >= next_report:
+            print(f"  tokenizer sample {len(sample):,} / {max_bytes:,} bytes", flush=True)
+            next_report += max_bytes // 8
         _ = name
     if len(sample) < 1024:
         raise RuntimeError("tokenizer sample is too small; check data sources")
@@ -220,9 +292,15 @@ def encode_mixture(
             source = source_list[index]
             iterator = iterators[source.name]
             try:
-                document = next(iterator)
+                document = _retry(
+                    lambda: next(iterator),
+                    label=f"read {source.name}",
+                )
             except StopIteration:
                 # Restart synthetic / exhausted streams by skipping this source briefly.
+                continue
+            except Exception as error:  # noqa: BLE001
+                print(f"  skipping {source.name} after repeated failures: {error}", flush=True)
                 continue
             tokens = tokenizer.encode(document, bos=True, eos=True)
             if not tokens:
@@ -261,7 +339,8 @@ def encode_mixture(
     return train_info, validation_info, per_source, documents
 
 
-def _restartable_hub(source: Cleo11DataSource, *, text_column: str) -> Iterator[str]:
+def _restartable_hub(source: Cleo11DataSource) -> Iterator[str]:
+    text_column = source.text_column or "text"
     while True:
         yielded = False
         for document in iter_hub_documents(source, text_column=text_column):
@@ -282,10 +361,7 @@ def _build_iterators(
             source.name: iter_synthetic_documents(config.prep.seed + index)
             for index, source in enumerate(sources)
         }
-    return {
-        source.name: _restartable_hub(source, text_column=config.prep.text_column)
-        for source in sources
-    }
+    return {source.name: _restartable_hub(source) for source in sources}
 
 
 def prepare_cleo11_data(
@@ -295,6 +371,7 @@ def prepare_cleo11_data(
     force: bool = False,
     synthetic: bool = False,
     vocab_size: int | None = None,
+    reuse_tokenizer: bool = False,
 ) -> dict[str, Any]:
     prep = config.prep
     profile = prep.profile(profile_name or prep.default_profile)
@@ -314,8 +391,10 @@ def prepare_cleo11_data(
     if force and output_dir.exists():
         for path in output_dir.glob("train-*.bin"):
             path.unlink()
+        for path in output_dir.glob("*.tmp"):
+            path.unlink()
         for path in outputs:
-            if path.exists():
+            if path.exists() and not (reuse_tokenizer and path == tokenizer_path):
                 path.unlink()
     output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -330,32 +409,45 @@ def prepare_cleo11_data(
         f"synthetic={synthetic}",
         flush=True,
     )
-    sample_iters = _build_iterators(config, sources, synthetic=synthetic)
-    sample = collect_tokenizer_sample(
-        [(name, iterator) for name, iterator in sample_iters.items()],
-        max_bytes=profile.tokenizer_sample_bytes,
-        seed=prep.seed,
-    )
-    resolved_vocab = vocab_size or config.data.tokenizer_vocab_size
-    if synthetic and resolved_vocab > 1024 and profile.tokenizer_sample_bytes < 8_000_000:
-        # Keep synthetic CI runs tractable with the pure-Python BPE trainer.
-        resolved_vocab = min(resolved_vocab, 512)
-        print(f"Synthetic prep using vocab_size={resolved_vocab}", flush=True)
+    sample_sha = ""
+    sample_bytes = 0
+    if reuse_tokenizer and tokenizer_path.exists():
+        print(f"Reusing existing tokenizer at {tokenizer_path}", flush=True)
+        tokenizer = ByteBPETokenizer.load(tokenizer_path)
+        sample_bytes = int(tokenizer.metadata.get("sample_bytes", 0))
+        sample_sha = str(tokenizer.metadata.get("sample_sha256", ""))
+    else:
+        sample_iters = _build_iterators(config, sources, synthetic=synthetic)
+        sample = collect_tokenizer_sample(
+            [(name, iterator) for name, iterator in sample_iters.items()],
+            max_bytes=profile.tokenizer_sample_bytes,
+            seed=prep.seed,
+        )
+        sample_bytes = len(sample)
+        sample_sha = hashlib.sha256(sample).hexdigest()
+        resolved_vocab = vocab_size or config.data.tokenizer_vocab_size
+        if synthetic and resolved_vocab > 1024 and profile.tokenizer_sample_bytes < 8_000_000:
+            # Keep synthetic CI runs tractable with the pure-Python BPE trainer.
+            resolved_vocab = min(resolved_vocab, 512)
+            print(f"Synthetic prep using vocab_size={resolved_vocab}", flush=True)
 
-    print(f"Training byte-level BPE vocab_size={resolved_vocab} on {len(sample):,} bytes", flush=True)
-    tokenizer = ByteBPETokenizer.train(
-        sample,
-        vocab_size=resolved_vocab,
-        metadata={
-            "mixture": config.data.mixture_name,
-            "profile": profile.name,
-            "synthetic": synthetic,
-            "sample_bytes": len(sample),
-            "sample_sha256": hashlib.sha256(sample).hexdigest(),
-            "sources": [asdict(source) for source in sources],
-        },
-    )
-    tokenizer.save(tokenizer_path)
+        print(
+            f"Training byte-level BPE vocab_size={resolved_vocab} on {len(sample):,} bytes",
+            flush=True,
+        )
+        tokenizer = ByteBPETokenizer.train(
+            sample,
+            vocab_size=resolved_vocab,
+            metadata={
+                "mixture": config.data.mixture_name,
+                "profile": profile.name,
+                "synthetic": synthetic,
+                "sample_bytes": len(sample),
+                "sample_sha256": sample_sha,
+                "sources": [asdict(source) for source in sources],
+            },
+        )
+        tokenizer.save(tokenizer_path)
 
     encode_iters = _build_iterators(config, sources, synthetic=synthetic)
     train_info, validation_info, per_source, documents = encode_mixture(
@@ -386,8 +478,8 @@ def prepare_cleo11_data(
             "vocab_size": tokenizer.vocab_size,
             "bos_id": tokenizer.bos_id,
             "eos_id": tokenizer.eos_id,
-            "sample_bytes": len(sample),
-            "sample_sha256": hashlib.sha256(sample).hexdigest(),
+            "sample_bytes": sample_bytes,
+            "sample_sha256": sample_sha,
         },
         "corpora": {
             "train": train_info,
@@ -413,6 +505,7 @@ def prepare_from_config_path(
     force: bool = False,
     synthetic: bool = False,
     vocab_size: int | None = None,
+    reuse_tokenizer: bool = False,
 ) -> dict[str, Any]:
     return prepare_cleo11_data(
         load_cleo11_config(config_path),
@@ -420,6 +513,7 @@ def prepare_from_config_path(
         force=force,
         synthetic=synthetic,
         vocab_size=vocab_size,
+        reuse_tokenizer=reuse_tokenizer,
     )
 
 

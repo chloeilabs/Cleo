@@ -89,5 +89,6 @@ def test_135m_config_has_pinned_hub_configs():
     assert by_name["FineWeb"].hub_config == "sample-10BT"
     assert by_name["Cosmopedia v2"].hub_id == "HuggingFaceTB/smollm-corpus"
     assert by_name["Python-Edu"].hub_config == "python-edu"
+    assert by_name["Python-Edu"].content_backend == "softwareheritage_s3"
     assert config.prep.profile("full").train_tokens == 2_720_000_000
     assert config.prep.profile("dev").train_tokens == 50_000_000

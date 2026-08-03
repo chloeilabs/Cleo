@@ -19,6 +19,7 @@ dependencies = [
 
 [project.optional-dependencies]
 cleo11 = [
+  "boto3==1.43.62",
   "datasets==4.0.0",
   "huggingface_hub==0.34.4",
 ]
@@ -32,6 +33,7 @@ dev = [
   "pytest==8.4.2",
 ]
 cleo11 = [
+  "boto3==1.43.62",
   "datasets==4.0.0",
   "huggingface_hub==0.34.4",
 ]

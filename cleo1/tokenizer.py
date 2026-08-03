@@ -63,20 +63,32 @@ class ByteBPETokenizer:
         span_counts: Counter[tuple[int, ...]] = Counter(tuple(span) for span in _spans(corpus))
         merges: list[tuple[int, int]] = []
         merge_count = vocab_size - 258
+        report_every = max(1, merge_count // 20)
         for offset in range(merge_count):
             pair_counts: Counter[tuple[int, int]] = Counter()
             for sequence, frequency in span_counts.items():
+                if len(sequence) < 2:
+                    continue
                 for pair in zip(sequence, sequence[1:]):
                     pair_counts[pair] += frequency
             if not pair_counts:
                 raise ValueError(f"corpus exhausted after {offset} merges")
             best_pair = min(pair_counts, key=lambda pair: (-pair_counts[pair], pair))
             new_id = 256 + offset
+            left, right = best_pair
             merged_counts: Counter[tuple[int, ...]] = Counter()
             for sequence, frequency in span_counts.items():
-                merged_counts[_replace_pair(sequence, best_pair, new_id)] += frequency
+                if left in sequence and right in sequence:
+                    merged_counts[_replace_pair(sequence, best_pair, new_id)] += frequency
+                else:
+                    merged_counts[sequence] += frequency
             span_counts = merged_counts
             merges.append(best_pair)
+            if offset == 0 or (offset + 1) % report_every == 0 or offset + 1 == merge_count:
+                print(
+                    f"  BPE merges {offset + 1:,}/{merge_count:,}",
+                    flush=True,
+                )
         return cls(merges=merges, vocab_size=vocab_size, metadata=dict(metadata or {}))
 
     def _encode_span(self, span: bytes) -> list[int]:

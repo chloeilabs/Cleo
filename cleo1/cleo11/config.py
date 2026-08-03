@@ -73,6 +73,8 @@ class Cleo11DataSource:
     hub_id: str = ""
     hub_config: str = ""
     license: str = ""
+    text_column: str = "text"
+    content_backend: str = "hub_text"  # hub_text | softwareheritage_s3
 
 
 @dataclass(frozen=True)

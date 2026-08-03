@@ -74,7 +74,9 @@ weight = 0.05
 hub_id = "HuggingFaceTB/smollm-corpus"
 hub_config = "python-edu"
 license = "ODC-By-1.0"
-notes = "Educational Python from the SmolLM corpus."
+text_column = "text"
+content_backend = "softwareheritage_s3"
+notes = "Educational Python from SmolLM corpus; file bodies are fetched from Software Heritage S3."
 
 [prep]
 output_dir = "data/cleo11/processed"
@@ -91,7 +93,7 @@ text_column = "text"
 name = "dev"
 train_tokens = 50000000
 validation_tokens = 2000000
-tokenizer_sample_bytes = 4194304
+tokenizer_sample_bytes = 1048576
 
 [[prep.profiles]]
 name = "full"
