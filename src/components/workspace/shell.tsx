@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { type ReactNode, useEffect, useState } from "react";
 
-import { CloseIcon, SidebarIcon } from "@/components/icons";
+import { SidebarIcon } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { ToastProvider } from "@/components/ui/toast";
 import { WorkspaceProvider } from "@/components/workspace/provider";
@@ -63,15 +63,10 @@ export function WorkspaceShell({
                 className="absolute inset-0 bg-black/60 backdrop-blur-sm"
               />
               <aside className="animate-fade-up absolute inset-y-0 left-0 w-72 border-r border-hairline bg-canvas">
-                <Sidebar onNavigate={() => setMobileOpen(false)} />
-                <button
-                  type="button"
-                  aria-label="Close navigation"
-                  onClick={() => setMobileOpen(false)}
-                  className="absolute top-3 right-3 rounded p-1 text-ink-faint hover:text-ink"
-                >
-                  <CloseIcon className="size-4" />
-                </button>
+                <Sidebar
+                  onNavigate={() => setMobileOpen(false)}
+                  onClose={() => setMobileOpen(false)}
+                />
               </aside>
             </div>
           ) : null}
@@ -88,16 +83,19 @@ export function WorkspaceShell({
                 <SidebarIcon className="size-4" />
               </Button>
 
+              {/* Wrapped rather than given `hidden` directly: the button's own
+                  `inline-flex` is an unconditional utility and would win. */}
               {collapsed ? (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  aria-label="Show sidebar"
-                  className="hidden md:inline-flex"
-                  onClick={() => setCollapsed(false)}
-                >
-                  <SidebarIcon className="size-4" />
-                </Button>
+                <div className="hidden md:block">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Show sidebar"
+                    onClick={() => setCollapsed(false)}
+                  >
+                    <SidebarIcon className="size-4" />
+                  </Button>
+                </div>
               ) : null}
             </div>
 

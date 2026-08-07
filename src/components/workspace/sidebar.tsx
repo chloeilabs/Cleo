@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import {
   ArchiveIcon,
+  CloseIcon,
   KeyIcon,
   LogoIcon,
   PlusIcon,
@@ -74,7 +75,14 @@ function AgentRow({
   );
 }
 
-export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
+export function Sidebar({
+  onNavigate,
+  onClose,
+}: {
+  onNavigate?: () => void;
+  /** Supplied by the mobile drawer, which needs a visible dismiss control. */
+  onClose?: () => void;
+}) {
   const router = useRouter();
   const params = useParams<{ agentId?: string }>();
   const { reportError, notify } = useToast();
@@ -211,6 +219,17 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
             </>
           )}
         </Menu>
+
+        {onClose ? (
+          <button
+            type="button"
+            aria-label="Close navigation"
+            onClick={onClose}
+            className="rounded p-1 text-ink-faint transition-colors hover:bg-raised hover:text-ink"
+          >
+            <CloseIcon className="size-4" />
+          </button>
+        ) : null}
       </div>
 
       <div className="px-3 pb-2">

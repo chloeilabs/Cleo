@@ -33,7 +33,6 @@ import { modelSelection, useWorkspace } from "@/components/workspace/provider";
 import { useRunStream } from "@/hooks/use-run-stream";
 import { api, type TranscriptRun } from "@/lib/api";
 import {
-  classNames,
   compactNumber,
   duration,
   firstLine,
@@ -364,38 +363,42 @@ export function ThreadView({ agentId }: { agentId: string }) {
   return (
     <div className="flex h-full min-w-0">
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex shrink-0 items-center gap-3 border-b border-hairline px-4 py-2.5 pl-14 md:pl-4">
+        <header className="flex shrink-0 items-center gap-2 border-b border-hairline px-3 py-2.5 pl-14 md:gap-3 md:px-4 md:pl-4">
           <div className="min-w-0 flex-1">
             <h1 className="truncate text-[14px] font-medium text-ink">
               {title}
             </h1>
 
-            <div className="mt-0.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11.5px] text-ink-faint">
+            {/* One line that never wraps: the header must not grow taller as
+                metadata accumulates, so the softer details drop out first. */}
+            <div className="mt-0.5 flex items-center gap-x-2.5 text-[11.5px] text-ink-faint">
               {agent.repos[0] ? (
                 <a
                   href={agent.repos[0]}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-1 transition-colors hover:text-ink-muted"
+                  className="inline-flex min-w-0 items-center gap-1 transition-colors hover:text-ink-muted"
                 >
-                  <RepoIcon className="size-3" />
-                  {agent.repoLabel}
+                  <RepoIcon className="size-3 shrink-0" />
+                  <span className="truncate">{agent.repoLabel}</span>
                 </a>
               ) : (
-                <span className="inline-flex items-center gap-1">
-                  <RepoIcon className="size-3" />
-                  Empty workspace
+                <span className="inline-flex min-w-0 items-center gap-1">
+                  <RepoIcon className="size-3 shrink-0" />
+                  <span className="truncate">Empty workspace</span>
                 </span>
               )}
 
               {branch?.branch ? (
-                <span className="inline-flex items-center gap-1 font-mono">
-                  <BranchIcon className="size-3" />
-                  {branch.branch}
+                <span className="hidden min-w-0 shrink items-center gap-1 font-mono sm:inline-flex">
+                  <BranchIcon className="size-3 shrink-0" />
+                  <span className="truncate">{branch.branch}</span>
                 </span>
               ) : null}
 
-              <span>{relativeTime(agent.lastModified)}</span>
+              <span className="hidden shrink-0 sm:inline">
+                {relativeTime(agent.lastModified)}
+              </span>
             </div>
           </div>
 
@@ -405,17 +408,18 @@ export function ThreadView({ agentId }: { agentId: string }) {
                 ? runStatusToAgentStatus(latestRun.status)
                 : agentStatus(agent)
             }
+            className="shrink-0"
           />
 
+          {/* Wrapped rather than given `hidden` directly: the button's own
+              `inline-flex` is an unconditional utility and would win. */}
           {branch?.prUrl ? (
-            <Button
-              size="sm"
-              onClick={() => window.open(branch.prUrl, "_blank")}
-              className="hidden sm:inline-flex"
-            >
-              <PullRequestIcon className="size-3.5" />
-              Pull request
-            </Button>
+            <div className="hidden shrink-0 md:block">
+              <Button size="sm" onClick={() => window.open(branch.prUrl, "_blank")}>
+                <PullRequestIcon className="size-3.5" />
+                Pull request
+              </Button>
+            </div>
           ) : null}
 
           <Button
@@ -544,7 +548,7 @@ export function ThreadView({ agentId }: { agentId: string }) {
       </div>
 
       {showDetails ? (
-        <div className={classNames("hidden lg:block")}>
+        <div className="hidden lg:block">
           <DetailsPanel
             agent={agent}
             runs={runs.map((entry) => entry.run)}
