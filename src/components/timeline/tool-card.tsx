@@ -132,11 +132,15 @@ export function ToolCard({ tool }: { tool: ToolView }) {
     tool.body || tool.diff || tool.markdown || tool.rawArgs || tool.rawResult,
   );
 
-  // Short diffs read better inline, which is also how Cursor shows them.
+  // Short diffs read better inline, which is also how Cursor shows them. This
+  // is derived rather than an initial state because a tool call first renders
+  // while still running, before its diff exists — the card has to open when the
+  // result lands, unless the reader has already made a choice.
   const diffLines = tool.diff ? tool.diff.split("\n").length : 0;
-  const [expanded, setExpanded] = useState(
-    isPlan || (diffLines > 0 && diffLines <= 22),
-  );
+  const autoExpanded = isPlan || (diffLines > 0 && diffLines <= 22);
+
+  const [override, setOverride] = useState<boolean | undefined>(undefined);
+  const expanded = override ?? autoExpanded;
   const [showRaw, setShowRaw] = useState(false);
 
   const interactive = hasDetail && !isPlan;
@@ -153,7 +157,7 @@ export function ToolCard({ tool }: { tool: ToolView }) {
       <button
         type="button"
         disabled={!interactive}
-        onClick={() => setExpanded((value) => !value)}
+        onClick={() => setOverride(!expanded)}
         className={classNames(
           "flex w-full items-center gap-2.5 px-3 py-2 text-left",
           interactive && "transition-colors hover:bg-raised",

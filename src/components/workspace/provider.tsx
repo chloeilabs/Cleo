@@ -82,21 +82,35 @@ export function WorkspaceProvider({
     DEFAULT_PREFERENCES,
   );
 
-  const inFlight = useRef(false);
+  const inFlight = useRef<{
+    key: string;
+    promise: Promise<AgentSummary[] | undefined>;
+  } | null>(null);
 
-  /** Fetch the list, collapsing concurrent calls from the poll and the UI. */
-  const fetchAgents = useCallback(async () => {
-    if (inFlight.current) return undefined;
-    inFlight.current = true;
+  /**
+   * Fetch the list, collapsing concurrent calls onto one request.
+   *
+   * Callers share the pending promise rather than being turned away, so a
+   * caller that arrives mid-flight still receives the result. Turning them away
+   * would drop the very first load under StrictMode's double-invoked effects.
+   */
+  const fetchAgents = useCallback(() => {
+    const key = String(showArchived);
+    if (inFlight.current?.key === key) return inFlight.current.promise;
 
-    try {
-      return (await api.agents({ includeArchived: showArchived })).items;
-    } catch {
-      // Keep the last known list on screen; the next poll retries.
-      return undefined;
-    } finally {
-      inFlight.current = false;
-    }
+    const promise = (async () => {
+      try {
+        return (await api.agents({ includeArchived: showArchived })).items;
+      } catch {
+        // Keep the last known list on screen; the next poll retries.
+        return undefined;
+      } finally {
+        if (inFlight.current?.key === key) inFlight.current = null;
+      }
+    })();
+
+    inFlight.current = { key, promise };
+    return promise;
   }, [showArchived]);
 
   const refreshAgents = useCallback(async () => {

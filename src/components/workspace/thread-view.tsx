@@ -41,17 +41,26 @@ import {
 } from "@/lib/format";
 import type { AgentSummary, RunSummary, TimelineItem } from "@/lib/types";
 
+/**
+ * A run in the thread. `streamed` records that the live stream has started
+ * producing for this run and is therefore the authority on its timeline — the
+ * stored transcript and the optimistic prompt both step aside at that point,
+ * because the stream replays the run from the beginning and would otherwise
+ * duplicate what is already on screen.
+ */
+type ThreadRun = TranscriptRun & { streamed?: boolean };
+
 interface ThreadState {
   agentId: string;
   agent: AgentSummary | null;
-  runs: TranscriptRun[];
+  runs: ThreadRun[];
   /** The run currently being streamed, if any. */
   activeRunId?: string;
   error?: string;
 }
 
 /** Stable identity so `useMemo` consumers do not see a new array each render. */
-const EMPTY_RUNS: TranscriptRun[] = [];
+const EMPTY_RUNS: ThreadRun[] = [];
 
 function upsertItem(items: TimelineItem[], item: TimelineItem): TimelineItem[] {
   const index = items.findIndex((entry) => entry.id === item.id);
@@ -193,15 +202,21 @@ export function ThreadView({ agentId }: { agentId: string }) {
             ...state,
             runs: [
               ...state.runs,
-              { run: { id: runId, agentId, status: "running" }, items: [item] },
+              {
+                run: { id: runId, agentId, status: "running" },
+                items: [item],
+                streamed: true,
+              },
             ],
           };
         }
 
+        const entry = state.runs[index];
         const runs = [...state.runs];
         runs[index] = {
-          ...runs[index],
-          items: upsertItem(runs[index].items, item),
+          ...entry,
+          streamed: true,
+          items: entry.streamed ? upsertItem(entry.items, item) : [item],
         };
         return { ...state, runs };
       });
@@ -217,7 +232,7 @@ export function ThreadView({ agentId }: { agentId: string }) {
         if (index === -1) return state;
 
         const runs = [...state.runs];
-        runs[index] = { ...runs[index], items };
+        runs[index] = { ...runs[index], streamed: true, items };
         return { ...state, runs };
       });
     },
