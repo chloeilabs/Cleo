@@ -95,7 +95,7 @@ npm run dev        # development server
 npm run build      # production build
 npm run start      # serve the production build
 npm run lint       # eslint
-npm run typecheck  # tsc --noEmit
+npm run typecheck  # next typegen && tsc --noEmit
 ```
 
 ## Layout
@@ -121,7 +121,7 @@ src/
 
 `Agent.create` · `Agent.resume` · `Agent.list` · `Agent.get` · `Agent.listRuns` ·
 `Agent.getRun` · `Agent.cancelRun` · `Agent.archive` · `Agent.unarchive` ·
-`Agent.delete` · `Agent.getUsage` · `agent.send` · `agent.listArtifacts` ·
-`agent.downloadArtifact` · `run.stream` · `run.conversation` · `run.wait` ·
-`run.onDidChangeStatus` · `Cursor.me` · `Cursor.models.list` ·
-`Cursor.repositories.list`
+`Agent.delete` · `Agent.getUsage` · `agent.send` · `agent.close` ·
+`agent.listArtifacts` · `agent.downloadArtifact` · `run.stream` ·
+`run.conversation` · `run.supports` · `run.onDidChangeStatus` · `Cursor.me` ·
+`Cursor.models.list` · `Cursor.repositories.list`
