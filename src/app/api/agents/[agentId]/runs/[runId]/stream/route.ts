@@ -1,7 +1,12 @@
 import { getRun, toRunSummary } from "@/lib/server/cursor";
 import { mapError } from "@/lib/server/errors";
 import { requireApiKey } from "@/lib/server/session";
-import { itemFromStreamEvent, itemsFromConversation } from "@/lib/server/timeline";
+import {
+  itemFromStreamEvent,
+  itemsFromConversation,
+  mergeTranscript,
+} from "@/lib/server/timeline";
+import type { TimelineItem } from "@/lib/types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -80,20 +85,23 @@ export async function GET(request: Request, context: Context) {
         });
 
         try {
+          const streamed: TimelineItem[] = [];
+
           if (run.status === "running" && run.supports("stream")) {
             let sequence = 0;
             for await (const event of run.stream()) {
               if (closed || request.signal.aborted) break;
               const item = itemFromStreamEvent(event, sequence++);
-              if (item) send("item", item);
+              if (!item) continue;
+              streamed.push(item);
+              send("item", item);
             }
           }
 
           if (!closed && !request.signal.aborted) {
             if (run.supports("conversation")) {
-              send("transcript", {
-                items: itemsFromConversation(await run.conversation()),
-              });
+              const stored = itemsFromConversation(await run.conversation());
+              send("transcript", { items: mergeTranscript(streamed, stored) });
             }
             send("run", toRunSummary(run));
           }

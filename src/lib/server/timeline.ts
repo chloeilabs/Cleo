@@ -160,3 +160,90 @@ export function itemFromStreamEvent(
       return undefined;
   }
 }
+
+/** Kinds the live stream produces that a stored transcript has no notion of. */
+const STREAM_ONLY = new Set<TimelineItem["kind"]>(["status", "usage", "error"]);
+
+/**
+ * A rough identity for a row, used to tell whether a streamed item and a stored
+ * one describe the same moment. Content is compared loosely because the stored
+ * copy is canonical and may differ in whitespace or truncation.
+ */
+function signature(item: TimelineItem): string {
+  switch (item.kind) {
+    case "tool":
+      return `tool:${item.tool.name}:${item.tool.title}`;
+    case "user":
+    case "assistant":
+    case "thinking":
+      return `${item.kind}:${item.text.slice(0, 48)}`;
+    case "shell":
+      return `shell:${item.command}`;
+    default:
+      return item.kind;
+  }
+}
+
+/**
+ * Fold the run's stored transcript into what was already streamed.
+ *
+ * The stored copy wins on content — it is what Cursor actually persisted — but
+ * rows that clearly correspond keep the id they were streamed under, so the
+ * client's timeline settles without remounting components and losing, say, an
+ * expanded diff. Cloud lifecycle rows exist only on the stream, so they are
+ * carried across explicitly.
+ */
+export function mergeTranscript(
+  rawStreamed: TimelineItem[],
+  stored: TimelineItem[],
+): TimelineItem[] {
+  // A tool call is emitted twice — once running, once complete — so collapse
+  // repeats onto the position where the id first appeared.
+  const seen = new Map<string, number>();
+  const streamed: TimelineItem[] = [];
+
+  for (const item of rawStreamed) {
+    const index = seen.get(item.id);
+    if (index === undefined) {
+      seen.set(item.id, streamed.length);
+      streamed.push(item);
+    } else {
+      streamed[index] = item;
+    }
+  }
+
+  if (streamed.length === 0) return stored;
+
+  // Remember each lifecycle row by how many content rows preceded it, so it can
+  // be spliced back into the same place in the reconciled list.
+  const content: TimelineItem[] = [];
+  const lifecycle: Array<{ after: number; item: TimelineItem }> = [];
+
+  for (const item of streamed) {
+    if (item.kind === "status") {
+      lifecycle.push({ after: content.length, item });
+    } else if (!STREAM_ONLY.has(item.kind)) {
+      content.push(item);
+    }
+  }
+
+  const reconciled = stored.map((item, index) => {
+    const previous = content[index];
+    return previous && signature(previous) === signature(item)
+      ? { ...item, id: previous.id }
+      : item;
+  });
+
+  const merged: TimelineItem[] = [];
+  let cursor = 0;
+
+  for (let index = 0; index <= reconciled.length; index += 1) {
+    while (cursor < lifecycle.length && lifecycle[cursor].after <= index) {
+      merged.push(lifecycle[cursor].item);
+      cursor += 1;
+    }
+    if (index < reconciled.length) merged.push(reconciled[index]);
+  }
+
+  return merged;
+}

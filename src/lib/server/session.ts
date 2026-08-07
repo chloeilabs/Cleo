@@ -23,9 +23,20 @@ const IV_BYTES = 12;
  * lets sessions survive restarts and span multiple server instances. Without
  * it we fall back to a per-process key: still safe, but everyone has to sign in
  * again after a restart.
+ *
+ * The fallback lives on `globalThis` because Next.js evaluates this module once
+ * per server layer — a route handler and a Server Component get separate
+ * instances. Two independently generated keys would mean a cookie sealed by
+ * `POST /api/session` could never be opened when rendering a page.
  */
+const globalSecret = globalThis as typeof globalThis & {
+  __cleoSessionSecret?: string;
+};
+
 const secretMaterial =
-  process.env.CLEO_SESSION_SECRET ?? randomBytes(32).toString("hex");
+  process.env.CLEO_SESSION_SECRET ??
+  (globalSecret.__cleoSessionSecret ??= randomBytes(32).toString("hex"));
+
 const secretKey = createHash("sha256").update(secretMaterial).digest();
 
 export class MissingApiKeyError extends Error {
