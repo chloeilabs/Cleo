@@ -1,0 +1,173 @@
+@import "tailwindcss";
+
+/*
+ * Cleo's surface language mirrors Cursor's: a nearly black canvas, panels that
+ * step up in luminance rather than in hue, hairline borders, and a single blue
+ * accent reserved for the active element.
+ */
+
+@theme {
+  --color-canvas: #0b0b0c;
+  --color-panel: #101012;
+  --color-raised: #17171a;
+  --color-overlay: #1c1c20;
+  --color-hairline: #232328;
+  --color-hairline-strong: #303038;
+
+  --color-ink: #ededf0;
+  --color-ink-muted: #9a9aa4;
+  --color-ink-faint: #6a6a74;
+
+  --color-accent: #4d8dfd;
+  --color-accent-strong: #2f74f0;
+  --color-accent-soft: #172542;
+
+  --color-positive: #3fb950;
+  --color-caution: #d29922;
+  --color-negative: #f4585c;
+  --color-thinking: #a78bfa;
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, monospace;
+
+  --radius-panel: 0.75rem;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overscroll-behavior: none;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-accent) 34%, transparent);
+}
+
+/* Thin, unobtrusive scrollbars that only assert themselves on hover. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-hairline-strong) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--color-hairline);
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background-clip: content-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-hairline-strong);
+}
+
+*::-webkit-scrollbar-corner,
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+  border-radius: 4px;
+}
+
+textarea,
+input {
+  font-family: inherit;
+}
+
+textarea::placeholder,
+input::placeholder {
+  color: var(--color-ink-faint);
+}
+
+@keyframes cleo-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@keyframes cleo-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes cleo-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes cleo-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@utility animate-pulse-dot {
+  animation: cleo-pulse 1.4s ease-in-out infinite;
+}
+
+@utility animate-fade-up {
+  animation: cleo-fade-up 0.18s ease-out both;
+}
+
+@utility animate-spin-slow {
+  animation: cleo-spin 0.9s linear infinite;
+}
+
+/* The "working…" label the agent shows while a turn is in flight. */
+@utility text-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-ink-faint) 0%,
+    var(--color-ink) 50%,
+    var(--color-ink-faint) 100%
+  );
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: cleo-shimmer 2.2s linear infinite;
+}
+
+/* Reusable surface + control recipes so components stay declarative. */
+@utility panel {
+  background-color: var(--color-panel);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-panel);
+}
+
+@utility hide-scrollbar {
+  scrollbar-width: none;
+}
